@@ -38,7 +38,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
 
                 var msg = await FollowupWithFileAsync(image, "chest.jpeg");
-                cache = new ImageCacheUrl(msg.Attachments.First().Url, 3600);
+                Context.BotUser.AllChests = new ImageCacheUrl(msg.Attachments.First().Url, 3600);
                 return;
             }
 
