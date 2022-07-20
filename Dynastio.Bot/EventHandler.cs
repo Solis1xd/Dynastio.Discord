@@ -44,7 +44,7 @@ namespace Dynastio.Bot
             if (!Program.IsDebug())
             {
                 await LeaveExtraGuild().Try();
-                ChannelUtilities.ExecuteImageOnlyModuleForAllChannels(_mongoService, _client, _localeService).RunInBackground(true);
+                ChannelUtilities.CheckImageOnlyChannels(_mongoService, _client, _localeService).RunInBackground(true);
             }
         }
 

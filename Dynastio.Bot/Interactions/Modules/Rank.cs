@@ -31,7 +31,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
 
             if (account_.Rank.IsAllowedToUploadNew())
             {
-                var rank = await Context.Dynastio.Database.GetUserRank(account_.Id);
+                var rank = await Context.Dynastio.Database.GetUserRanAsync(account_.Id);
                 if (rank == null)
                 {
                     await FollowupAsync(embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));

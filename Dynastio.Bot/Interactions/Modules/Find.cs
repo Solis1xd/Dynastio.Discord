@@ -47,7 +47,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             players = players.Where(
                 a =>
                 a.Nickname.ToLower().Contains(nickname) &&
-                a.Parent.ServerName.ToLower().Contains(server) &&
+                a.Parent.Label.ToLower().Contains(server) &&
                 a.Level > MinLevel && a.Level < MaxLevel &&
                 a.Score > MinScore && a.Score < MaxScore
                 ).ToList();
@@ -66,7 +66,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                     players = players.OrderByDescending(a => a.Team).ToList();
                     break;
                 case SortType.Server:
-                    players = players.OrderByDescending(a => a.Parent.ServerName).ToList();
+                    players = players.OrderByDescending(a => a.Parent.Label).ToList();
                     break;
                 case SortType.Nickname:
                     players = players.OrderByDescending(a => a.Nickname).ToList();
@@ -78,7 +78,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             var players1 = players.Skip((page - 1) * take).Take(take).ToList();
             var content = players1.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
                 a => players.IndexOf(a),
-                a => a.Parent.ServerName.Summarizing(16),
+                a => a.Parent.Label.Summarizing(16),
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
                 a => a.Team.RemoveLines().Summarizing(10),

@@ -17,6 +17,7 @@ namespace Dynastio.Bot
 {
     public class Program
     {
+        public const int ImageOnlyChannelsSlowMode = 30;
         public static Random Random = new Random();
         public static DateTime StartUp { get; } = DateTime.UtcNow;
         public static void Main(string[] arg) => new Program().MainAsync().GetAwaiter().GetResult();

@@ -38,14 +38,14 @@ namespace Dynastio.Bot
                 List<AutocompleteResult> results = new();
 
                 string match = autocompleteInteraction.Data.Current.Value.ToString();
-                var servers = Dynastio.Game.OnlineServers.Where(a => a.ServerName.ToLower().Contains(match)).Take(25).ToList();
+                var servers = Dynastio.Game.OnlineServers.Where(a => a.Label.ToLower().Contains(match)).Take(25).ToList();
 
                 foreach (var server in servers)
                 {
                     results.Add(new AutocompleteResult()
                     {
-                        Name = server.ServerName.Summarizing(20),
-                        Value = server.ServerName.Summarizing(60, false)
+                        Name = server.Label.Summarizing(20),
+                        Value = server.Label.Summarizing(60, false)
                     });
                 }
                 // max - 25 suggestions at a time (API limit)

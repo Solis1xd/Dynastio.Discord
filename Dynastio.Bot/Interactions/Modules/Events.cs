@@ -21,7 +21,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         {
             await DeferAsync();
             server = server.ToLower();
-            var onlineServers = Context.Dynastio.Game.OnlineServers.Where(a => !a.IsPrivate && a.ServerName.ToLower().Contains(server)).ToList();
+            var onlineServers = Context.Dynastio.Game.OnlineServers.Where(a => !a.IsPrivate && a.Label.ToLower().Contains(server)).ToList();
             var events = onlineServers.SelectMany(a => a.Events).GroupBy(a => a.id).ToList();
             string content = events.ToStringTable(new string[] { "Event", "Coef", "Started At", "End At", "Servers" },
                 a => a.First().kind.type,

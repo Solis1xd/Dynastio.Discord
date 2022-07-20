@@ -37,7 +37,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             }
             players = players.Where(
                 a =>
-                a.Parent.ServerName.ToLower().Contains(server)
+                a.Parent.Label.ToLower().Contains(server)
                 ).ToList();
 
             players = sort == SortType.Score ?
@@ -47,7 +47,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             var players1 = players.Skip((page - 1) * take).Take(take).ToList();
             var content = players1.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
                 a => players.IndexOf(a),
-                a => a.Parent.ServerName.Summarizing(16),
+                a => a.Parent.Label.Summarizing(16),
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
                 a => a.Team.RemoveLines().Summarizing(10),

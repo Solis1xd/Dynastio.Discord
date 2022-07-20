@@ -63,11 +63,12 @@ namespace Dynastio.Bot
             }
             return false;
         }
-        public static async Task ExecuteImageOnlyModuleForAllChannels(MongoService _mongoService, DiscordSocketClient _client, LocaleService _localeService)
+        public static async Task CheckImageOnlyChannels(MongoService _mongoService, DiscordSocketClient _client, LocaleService _localeService)
         {
             var guilds = await _mongoService.GetGuildsByMessageOnlyChannelsAsync();
             foreach (var g in guilds)
             {
+                bool updateGuild = false;
                 try
                 {
                     if (!g.IsModerationEnabled) continue;
@@ -77,10 +78,22 @@ namespace Dynastio.Bot
 
                     foreach (var c in g.OnlyImageChannels)
                     {
+
                         try
                         {
                             var channel = guild.GetTextChannel(c);
-                            if (channel == null) continue;
+                            if (channel == null)
+                            {
+                                g.OnlyImageChannels.Remove(c);
+                                updateGuild = true;
+                                continue;
+                            };
+                            if (channel.SlowModeInterval < Program.ImageOnlyChannelsSlowMode)
+                            {
+                                g.OnlyImageChannels.Remove(c);
+                                updateGuild = true;
+                                continue;
+                            }
 
                             var messages = await channel.GetMessagesAsync(100).FlattenAsync();
 
@@ -106,9 +119,12 @@ namespace Dynastio.Bot
 
                         }
                         catch { }
+
                     }
                 }
                 catch { }
+
+                if (updateGuild) await g.UpdateAsync();
             }
 
         }

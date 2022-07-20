@@ -21,7 +21,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
     public class ChannelsModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         [Group("overview", "channel overview")]
-        [RateLimit(180, 3, RateLimit.RateLimitType.User)]
+        [RateLimit(30, 3, RateLimit.RateLimitType.User)]
         public class OverviewModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             [RequireBotPermission(ChannelPermission.ManageChannels)]
@@ -56,8 +56,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
         public class ImageOnlyModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             [RequireBotPermission(GuildPermission.ManageMessages)]
-            [RequireChannelSlowmode(30)]
-            [RateLimit(180, 9, RateLimit.RateLimitType.User)]
+            [RequireChannelSlowmode(Program.ImageOnlyChannelsSlowMode)]
+            [RateLimit(80, 8, RateLimit.RateLimitType.User)]
             [SlashCommand("add", "Image Channels")]
             public async Task add(ITextChannel channel)
             {
