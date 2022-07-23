@@ -17,6 +17,17 @@ namespace Dynastio.Bot
                 else await task;
             });
         }
+        public static async Task<T> TryGet<T>(this Task<T> task)
+        {
+            try
+            {
+                return await task;
+            }
+            catch
+            {
+                return default(T);
+            }
+        }
         public static async Task<bool> Try(this Task task)
         {
             try

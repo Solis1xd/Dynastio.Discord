@@ -21,23 +21,31 @@ namespace Dynastio.Bot.Interactions.SlashCommands
 
         [RequireAccount]
         [SlashCommand("profile", "your profile")]
-        public async Task profile([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",bool Cache = true)
+        public async Task profile([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "", bool Cache = true)
         {
             await DeferAsync();
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccountByHashCode(int.Parse(account));
-            if (!Cache) account_.Profile = new();
 
-            if (account_.Profile.IsAllowedToUploadNew())
+            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account) 
+                ? Context.BotUser.GetAccount() 
+                : Context.BotUser.GetAccount(int.Parse(account));
+           
+            if (!Cache) selectedAccount.Profile = new();
+
+            if (selectedAccount.Profile.IsAllowedToUploadNew())
             {
-                var profile = await Context.Dynastio.Database.GetUserProfileAsync(account_.Id);
+                var profile = await Context.Dynastio.Database.GetUserProfileAsync(selectedAccount.Id).TryGet();
+                if (profile == null)
+                {
+                    await FollowupAsync("data not found.");
+                    return;
+                }
                 var image = GraphicService.GetProfile(profile);
-
                 var msg = await FollowupWithFileAsync(image, "profile.jpeg");
-                account_.Profile = new ImageCacheUrl(msg.Attachments.First().Url, 3600);
+                selectedAccount.Profile = new ImageCacheUrl(msg.Attachments.First().Url, 3600);
             }
             else
             {
-                await FollowupAsync(embed: $"This Profile Is For {account_.Profile.UploadedAt.ToDiscordUnixTimestampFormat()}".ToEmbed("", null, account_.Profile.Url));
+                await FollowupAsync(embed: $"This Profile Is For {selectedAccount.Profile.UploadedAt.ToDiscordUnixTimestampFormat()}".ToEmbed("", null, selectedAccount.Profile.Url));
             }
         }
 

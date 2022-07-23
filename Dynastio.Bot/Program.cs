@@ -81,8 +81,9 @@ namespace Dynastio.Bot
         {
             GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages,
             AlwaysDownloadUsers = true,
-            MessageCacheSize = 30,
-
+            AlwaysDownloadDefaultStickers=false,
+            DefaultRetryMode=RetryMode.AlwaysRetry,
+            
         };
         public async Task RunAsync(IServiceProvider _services)
         {
@@ -103,7 +104,11 @@ namespace Dynastio.Bot
             await Task.Delay(Timeout.Infinite);
 
         }
-        private async Task LogAsync(LogMessage message) => Console.WriteLine(message.ToString());
+        private Task LogAsync(LogMessage message)
+        {
+            Console.WriteLine(message.ToString());
+            return Task.CompletedTask;
+        }
         public static void Log(string service, string text)
         {
             Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);

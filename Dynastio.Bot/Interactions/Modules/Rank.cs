@@ -26,12 +26,12 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         public async Task rank([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",bool Cache = true)
         {
             await DeferAsync();
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccountByHashCode(int.Parse(account));
+            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
             if (!Cache) account_.Rank = new();
 
             if (account_.Rank.IsAllowedToUploadNew())
             {
-                var rank = await Context.Dynastio.Database.GetUserRanAsync(account_.Id);
+                var rank = await Context.Dynastio.Database.GetUserRanAsync(account_.Id).TryGet();
                 if (rank == null)
                 {
                     await FollowupAsync(embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));

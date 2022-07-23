@@ -23,7 +23,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         [SlashCommand("chest", "your private chest")]
         public async Task personalChest(bool All = false, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "", bool Cache = true)
         {
-            if (!All)
+            if (!All || Context.BotUser.Accounts.Count < 2)
             {
                 await _personalChest(account, Cache);
                 return;
@@ -35,6 +35,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             if (cache.IsAllowedToUploadNew())
             {
                 var chests = await Context.BotUser.Accounts.GetPersonalchests(Context.Dynastio);
+
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
 
                 var msg = await FollowupWithFileAsync(image, "chest.jpeg");
@@ -47,12 +48,20 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         private async Task _personalChest(string account = "", bool Cache = true)
         {
             await DeferAsync();
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccountByHashCode(int.Parse(account));
+            UserAccount account_ = string.IsNullOrWhiteSpace(account) 
+                ? Context.BotUser.GetAccount() 
+                : Context.BotUser.GetAccount(int.Parse(account));
+
             if (!Cache) account_.Chest = new();
 
             if (account_.Chest.IsAllowedToUploadNew())
             {
-                var chest = await Context.Dynastio.Database.GetUserPersonalchestAsync(account_.Id);
+                var chest = await Context.Dynastio.Database.GetUserPersonalchestAsync(account_.Id).TryGet();
+                if (chest == null)
+                {
+                    await FollowupAsync("chest not found, join the game and put something to your chest.");
+                    return;
+                }
                 var image = GraphicService.GetPersonalChest(chest);
 
                 var msg = await FollowupWithFileAsync(image, "chest.jpeg");

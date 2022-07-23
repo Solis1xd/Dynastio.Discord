@@ -143,7 +143,6 @@ namespace Dynastio.Bot
                 }
             }
             return image;
-
         }
         public Image GetRank(Image avatar, UserRank rank)
         {

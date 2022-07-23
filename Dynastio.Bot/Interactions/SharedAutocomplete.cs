@@ -26,7 +26,7 @@ namespace Dynastio.Bot
                 new List<AutocompleteResult>() { new AutocompleteResult() { Name = "All", Value = "0" } };
 
                 // max - 25 suggestions at a time (API limit)
-                return AutocompletionResult.FromSuccess(results.Take(25));
+                return await Task.FromResult(AutocompletionResult.FromSuccess(results.Take(25)));
             }
         }
 
@@ -49,7 +49,7 @@ namespace Dynastio.Bot
                     });
                 }
                 // max - 25 suggestions at a time (API limit)
-                return AutocompletionResult.FromSuccess(results);
+                return await Task.FromResult(AutocompletionResult.FromSuccess(results));
             }
         }
     }

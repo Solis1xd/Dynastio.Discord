@@ -45,7 +45,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
         {
             await DeferAsync();
 
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccountByHashCode(int.Parse(account));
+            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
             Context.BotUser.SwitchDefault(account_);
             await Context.BotUser.UpdateAsync();
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
@@ -56,7 +56,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
         {
             await DeferAsync();
 
-            UserAccount account_ = Context.BotUser.GetAccountByHashCode(int.Parse(account));
+            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
 
             account_.Nickname = newNickname;
 
@@ -72,7 +72,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
         {
             await DeferAsync();
 
-            UserAccount account_ = Context.BotUser.GetAccountByHashCode(int.Parse(account));
+            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
 
             Context.BotUser.RemoveAccount(account_);
 

@@ -33,8 +33,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             int MaxLevel = int.MaxValue,
             int MinScore = 0,
             int MaxScore = int.MaxValue,
-            int page = 1
-            )
+            int page = 1)
         {
             await DeferAsync();
 

@@ -24,7 +24,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         {
             await DeferAsync();
 
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccountByHashCode(int.Parse(account));
+            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
             string type = (stat == StatType.Craft || stat == StatType.Gather || stat == StatType.Shop) ? "item" : "entity";
             string property = stat.ToString().ToLower();
 
@@ -32,7 +32,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             if (!Cache) imageCacheUrl = new();
             if (result is false || result && imageCacheUrl.IsAllowedToUploadNew())
             {
-                var stat_ = await Context.Dynastio.Database.GetUserStatAsync(account_.Id);
+                var stat_ = await Context.Dynastio.Database.GetUserStatAsync(account_.Id).TryGet();
                 if (stat_ is null)
                 {
                     await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
