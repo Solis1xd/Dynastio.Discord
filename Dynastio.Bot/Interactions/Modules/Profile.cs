@@ -25,10 +25,10 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         {
             await DeferAsync();
 
-            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account) 
-                ? Context.BotUser.GetAccount() 
+            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
+                ? Context.BotUser.GetAccount()
                 : Context.BotUser.GetAccount(int.Parse(account));
-           
+
             if (!Cache) selectedAccount.Profile = new();
 
             if (selectedAccount.Profile.IsAllowedToUploadNew())

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dynastio.Bot
 {
-    public static class TaskExtenstions
+    public static class TaskExtensions
     {
         public static void RunInBackground(this Task task, bool tryCatch = false)
         {

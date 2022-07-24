@@ -15,15 +15,11 @@ namespace Dynastio.Bot
 
         public static bool IsStaticInteractionCommand(SocketInteraction interaction)
         {
-            if (interaction is SocketMessageComponent Smc)
+            if (interaction is SocketMessageComponent or SocketModal)
             {
-                if (object.Equals(Smc.Data.CustomId.Substring(0, 1), Perfix))
+                if (object.Equals((interaction as SocketMessageComponent).Data.CustomId.Substring(0, 1), Perfix))
                     return false;
             }
-            else if (interaction is SocketModal Sm)
-                if (object.Equals(Sm.Data.CustomId.Substring(0, 1), Perfix))
-                    return false;
-
             return true;
         }
     }

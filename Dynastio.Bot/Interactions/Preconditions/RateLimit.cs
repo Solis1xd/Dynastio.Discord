@@ -18,15 +18,15 @@ namespace Discord.Interactions
         private readonly RateLimitType? _ratelimitType;
         private readonly RateLimitBaseType _baseType;
         private readonly int _requests;
-        private readonly int _perSeconds;
-        public RateLimit(int PerSeconds = 4, int Requests = 1, RateLimitType Context = RateLimitType.User, RateLimitBaseType BaseType = RateLimitBaseType.BaseOnCommandInfo)
+        private readonly int _seconds;
+        public RateLimit(int Seconds = 4, int Requests = 1, RateLimitType Context = RateLimitType.User, RateLimitBaseType BaseType = RateLimitBaseType.BaseOnCommandInfo)
         {
             this._ratelimitType = Context;
             this._requests = Requests;
-            this._perSeconds = PerSeconds;
+            this._seconds = Seconds;
             this._baseType = BaseType;
         }
-
+  
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
             ulong id = _ratelimitType.Value switch
@@ -55,12 +55,12 @@ namespace Discord.Interactions
             
             foreach (var c in commands)
             {
-                if ((dateTime - c.createdAt).TotalSeconds > _perSeconds)
+                if ((dateTime - c.createdAt).TotalSeconds > _seconds)
                     target.Remove(c);
             }
 
             if (commands.Count > _requests)
-                return Task.FromResult(PreconditionResult.FromError($"{_ratelimitType} using this command very fast, you can use this command every {_perSeconds} seconds, wait a while."));
+                return Task.FromResult(PreconditionResult.FromError($"{_ratelimitType} using this command very fast, you can use this command every {_seconds} seconds, wait a while."));
 
 
             target.Add(new RateLimitItem()

@@ -18,7 +18,7 @@ namespace Dynastio.Bot
             var list = new List<Personalchest>();
             foreach (var a in Accounts)
             {
-                var result = await client.Database.GetUserPersonalchestAsync(a.Id);
+                var result = await client.Database.GetUserPersonalchestAsync(a.Id).TryGet();
                 if (result != null)
                     list.Add(result);
             }

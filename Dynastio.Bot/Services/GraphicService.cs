@@ -144,22 +144,26 @@ namespace Dynastio.Bot
             }
             return image;
         }
-        public Image GetRank(Image avatar, UserRank rank)
+        public Image GetRank(Image avatar, UserRank rank, string nickname, int discordTag)
         {
-            Image image = Image.Load($@"Images/rank.png".ResourcesPath());
+            Image<Rgba32> image = new(934, 282);
+            avatar.Mutate(x => x.Resize(162, 162));
+            image.Mutate(x => x.DrawImage(avatar, new Point(47, 54), 1f));
 
-            avatar.Mutate(x => x.Resize(160, 160));
-            image.Mutate(x => x.DrawImage(avatar, new Point(14, 20), 1f));
+            Image background = Image.Load($@"Images/rank.png".ResourcesPath());
+            image.Mutate(x => x.DrawImage(background, new Point(0, 0), 1f));
 
-            var pointRank = new PointF() { X = 200, Y = 22 };
-            image.Mutate(x => x.DrawText("# " + rank.Monthly.ToString(), new Font(fontFamily, 50, FontStyle.Bold), Color.Orange, pointRank));
+            image.Mutate(x => x.DrawText(nickname, new Font(fontFamily, 60, FontStyle.Bold), Color.Orange, new PointF() { X = 250, Y = 140 }));
+            image.Mutate(x => x.DrawText("#" + discordTag.ToString(), new Font(fontFamily, 35, FontStyle.Bold), Color.Orange, new PointF() { X = 250 + (nickname.Length * 32), Y = 150 + 10 }));
 
-            var pointDailyRank = new PointF() { X = 190, Y = 90 };
-            image.Mutate(x => x.DrawText($"weekly #{rank.Weekly} | daily#{rank.Daily} ", new Font(fontFamily, 17, FontStyle.Regular), Color.White, pointDailyRank));
+            var pointRank = new PointF() { X = 820 - (rank.Monthly.ToString().Length * 35), Y = 60 };
+            image.Mutate(x => x.DrawText("#" + rank.Monthly.ToString(), new Font(fontFamily, 72, FontStyle.Bold), Color.White, pointRank));
+            image.Mutate(x => x.DrawText("RANK", new Font(fontFamily, 30, FontStyle.Bold), Color.White, new PointF(pointRank.X - 90, pointRank.Y + 30)));
 
-
+            image.Mutate(x => x.DrawText("Weekly " + rank.Weekly, new Font(fontFamily, 25, FontStyle.Bold), Color.White, new PointF(pointRank.X, pointRank.Y + 75)));
+            image.Mutate(x => x.DrawText("Daily " + rank.Daily, new Font(fontFamily, 25, FontStyle.Bold), Color.White, new PointF(pointRank.X, pointRank.Y + 100)));
+            
             return image;
-
         }
         public Image GetPersonalChests(params Personalchest[] personalchests)
         {

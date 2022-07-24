@@ -15,13 +15,12 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     [RequireBotPermission(ChannelPermission.AttachFiles)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RequireContext(ContextType.Guild)]
-    [RateLimit(240, 2, RateLimit.RateLimitType.User)]
     public class Rank : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
 
         [RequireAccount]
-        [RateLimit(60, 2, RateLimit.RateLimitType.User)]
+        [RateLimit(3)]
         [SlashCommand("rank", "your dynast.io rank")]
         public async Task rank([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",bool Cache = true)
         {
@@ -46,7 +45,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                     {
                         using (var Avatar = SixLabors.ImageSharp.Image.Load(mem))
                         {
-                            var img = GraphicService.GetRank(Avatar, rank);
+                            var img = GraphicService.GetRank(Avatar, rank,user.Username,user.DiscriminatorValue);
                             using (var stream = new System.IO.MemoryStream())
                             {
                                 img.SaveAsJpeg(stream);
