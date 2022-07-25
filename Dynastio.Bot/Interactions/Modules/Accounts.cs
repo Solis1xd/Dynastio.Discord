@@ -12,13 +12,13 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
 {
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    [RateLimit(600, 10, RateLimit.RateLimitType.User)]
     [Group("accounts", "your dynast.io accounts settings")]
     public class AccountsModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public UserService userManager { get; set; }
         public DynastioClient Dynastio { get; set; }
 
+        [RateLimit(10)]
         [SlashCommand("list", "dynastio accounts")]
         public async Task list()
         {
@@ -39,6 +39,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
                     Url = "https://www.youtube.com/channel/UCW0PmC1B8jjhpKLHciFp0xA/?sub_confirmation=1"
                 }.Build());
         }
+        [RateLimit(10)]
         [RequireAccount]
         [SlashCommand("set-default", "set an account as default account")]
         public async Task setDefault([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
@@ -51,6 +52,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
         [RequireAccount]
+        [RateLimit(5)]
         [SlashCommand("edit", "edit your added account")]
         public async Task edit([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account, string newNickname)
         {
@@ -67,6 +69,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
         [RequireAccount]
+        [RateLimit(3)]
         [SlashCommand("remove", "remove a connected account")]
         public async Task remove([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
         {
@@ -80,11 +83,11 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_removed"].ToSuccessfulEmbed("account_removed"));
         }
-
+        [RateLimit(10)]
         [SlashCommand("add", "connect new account to the bot")]
         public async Task addaccount()
         {
-            var modal = new ModalBuilder(this["edit_account"], $"accounts add")
+            var modal = new ModalBuilder(this["add_account"], $"accounts add")
                .AddTextInput(new TextInputBuilder(this["nickname"], "nickname", TextInputStyle.Short, this["custom_nickname"], 1, 16, true, null))
                .AddTextInput(new TextInputBuilder(this["coin"], "coin", TextInputStyle.Short, this["account_coins_number"], 1, 16, true, null))
                .AddTextInput(new TextInputBuilder(this["account_id"], "id", TextInputStyle.Short, "google:00000000000000000000", 1, 150, true, null))
@@ -125,7 +128,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
                 return;
             }
 
-            Profile acc = await Dynastio.Database.GetUserProfileAsync(id);
+            Profile acc = await Dynastio.Database.GetUserProfileAsync(id).TryGet();
             if (acc is null)
             {
                 await FollowupAsync(Context.UserMention(), embed: this["no_account_found"].ToWarnEmbed(this["no_account_found"]));

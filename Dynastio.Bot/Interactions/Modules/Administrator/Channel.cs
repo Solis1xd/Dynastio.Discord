@@ -53,6 +53,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
                 Year = 29030400
             }
         }
+
+        [Group("image-only", "image only channels")]
         public class ImageOnlyModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             [RequireBotPermission(GuildPermission.ManageMessages)]
@@ -71,6 +73,13 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
                 Context.BotGuild.OnlyImageChannels.Add(channel.Id);
                 await Context.BotGuild.UpdateAsync();
                 await FollowupAsync(Context.User.Id.ToUserMention(), embed: "The channel added to the image-channels.".ToSuccessfulEmbed("Channel Added"));
+            }
+            [SlashCommand("list", "Image Channels")]
+            public async Task list()
+            {
+                await DeferAsync();
+                var content = string.Join("\n", Context.BotGuild.OnlyImageChannels.Select(a => Discord.MentionUtils.MentionChannel(a)).ToArray());
+                await FollowupAsync(embed: content.ToEmbed("Image-only channels"));
             }
             [SlashCommand("remove", "Image Channels")]
             public async Task remove(ITextChannel channel)

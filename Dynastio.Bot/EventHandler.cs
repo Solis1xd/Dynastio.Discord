@@ -90,7 +90,7 @@ namespace Dynastio.Bot
             {
                 if (arg.Guild.Id == _configuration.Guilds.Main) return;
 
-                await arg.SendMessageAsync(img + " \n" + _configuration.Guilds.InviteLinkMain,
+                await arg.SendMessageAsync(_configuration.Guilds.InviteLinkMain, embed: "".ToEmbed(ImageUrl: img),
                 components: new ComponentBuilder()
                             .WithButton("Как взломать монеты ?", null, ButtonStyle.Link, null, _configuration.YoutubeLink)
                             .WithButton("How To Hack Dynast.io ?", null, ButtonStyle.Link, null, _configuration.YoutubeLink)

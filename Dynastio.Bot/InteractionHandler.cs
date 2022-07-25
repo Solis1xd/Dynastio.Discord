@@ -33,7 +33,7 @@ namespace Dynastio.Bot
             _dynastClient = services.GetRequiredService<DynastioClient>();
             localeService = services.GetRequiredService<LocaleService>();
             _guildservice = services.GetRequiredService<GuildService>();
-            this.mongoService = services.GetRequiredService<MongoService>();
+            mongoService = services.GetRequiredService<MongoService>();
             _services = services;
         }
 

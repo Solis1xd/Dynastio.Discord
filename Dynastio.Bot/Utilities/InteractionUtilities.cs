@@ -8,18 +8,20 @@ using System.Threading.Tasks;
 
 namespace Dynastio.Bot
 {
-
     public class InteractionUtilities
     {
         public const string Perfix = "$";
-
         public static bool IsStaticInteractionCommand(SocketInteraction interaction)
         {
-            if (interaction is SocketMessageComponent or SocketModal)
+            if (interaction is SocketMessageComponent Smc)
             {
-                if (object.Equals((interaction as SocketMessageComponent).Data.CustomId.Substring(0, 1), Perfix))
+                if (object.Equals(Smc.Data.CustomId.Substring(0, 1), Perfix))
                     return false;
             }
+            else if (interaction is SocketModal Sm)
+                if (object.Equals(Sm.Data.CustomId.Substring(0, 1), Perfix))
+                    return false;
+
             return true;
         }
     }
