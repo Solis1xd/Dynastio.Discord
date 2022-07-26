@@ -17,6 +17,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RequireUserPermission(GuildPermission.Administrator)]
+    [DefaultMemberPermissions(GuildPermission.Administrator)]
     public class Guild : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         [Group("setting", "server setting")]

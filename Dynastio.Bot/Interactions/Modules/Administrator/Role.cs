@@ -19,9 +19,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
     public class RoleModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         [RequireUserPermission(GuildPermission.Administrator)]
-        [RequireBotPermission(ChannelPermission.SendMessages)]
-        [RequireBotPermission(ChannelPermission.ReadMessageHistory)]
-        [RequireBotPermission(ChannelPermission.ViewChannel)]
+        [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ViewChannel | ChannelPermission.ReadMessageHistory)]
+        [DefaultMemberPermissions(GuildPermission.Administrator)]
         [RateLimit(60, 10, RateLimit.RateLimitType.User)]
         [Group("assignment", "Role Assignment")]
         public class AssignmentModule : CustomInteractionModuleBase<CustomSocketInteractionContext>

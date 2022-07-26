@@ -1,0 +1,24 @@
+0.4.6 - 23/07/2022
+- add default user permissions
+- better edit embed builder command
+
+0.4.5 — 22/07/2022
+- new rank style
+- new command for guild admins (channel image-only)
+- new command for guild admins (embed builder)
+- new command for guild admins (role assignments)
+- new command for guild admins (channel overview slowmode)
+- new command for guild admins (server settings moderator)
+- ratelimits
+- new leaderboard commands
+- new command (leaderboard me)
+- new command (find)
+- new command (provider)
+- new command (ping)
+- cache chest, profile and stat images
+- fix add account
+- fix interaction modals bug
+- fix changelog bug
+
+1.0.0  — 03/01/2021
+- Initial release

@@ -1,5 +1,7 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using Discord;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +23,6 @@ namespace Dynastio.Bot
         public ulong Id { get; set; }
         public bool IsModerationEnabled { get; set; } = false;
         public List<ulong> OnlyImageChannels { get; set; } = new();
-
         public async Task UpdateAsync()
         {
             if (_guildService != null)

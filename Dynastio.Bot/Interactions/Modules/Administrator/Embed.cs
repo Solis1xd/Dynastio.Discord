@@ -11,10 +11,11 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.ComponentModel;
 
-namespace Dynastio.Bot.Interactions.Modules
+namespace Dynastio.Bot.Interactions.Modules.Administrator
 {
     [Group("embed", "embed utilities")]
     [RequireContext(ContextType.Guild)]
+    [DefaultMemberPermissions(GuildPermission.Administrator)]
     [RequireUserPermission(GuildPermission.Administrator)]
     public class EmbedModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
@@ -31,7 +32,21 @@ namespace Dynastio.Bot.Interactions.Modules
             [SlashCommand("edit", "edit an embed")]
             public async Task edit(string MessageId)
             {
-                await RespondWithModalAsync<EmbedBuilderForm>($"embed builder modal-create:{MessageId}");
+                var message = await Context.Channel.GetMessageAsync(ulong.Parse(MessageId));
+                var embed = message.Embeds.FirstOrDefault();
+                await Context.Interaction.RespondWithModalAsync<EmbedBuilderForm>($"embed builder modal-create:{MessageId}", null,
+                    x =>
+                    {
+                        x.UpdateTextInput("content", c => c.Value = message.Content);
+                        if (embed != null)
+                        {
+                            x.UpdateTextInput("title", c => c.Value = embed.Title ?? "");
+                            x.UpdateTextInput("description", c => c.Value = embed.Description ?? "");
+
+                            x.UpdateTextInput("thumbnail-url", c => c.Value = embed.Thumbnail.HasValue ? embed.Thumbnail.Value.Url : "");
+                            x.UpdateTextInput("image-url", c => c.Value = embed.Image.HasValue ? embed.Image.Value.Url : "");
+                        }
+                    });
             }
             [ModalInteraction("embed builder modal-create:*", true)]
             public async Task role_assignment_create(string edit, EmbedBuilderForm form)

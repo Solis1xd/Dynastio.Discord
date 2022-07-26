@@ -55,13 +55,19 @@ namespace Dynastio.Bot
 
         private async Task ReadyAsync()
         {
-
             // Context & Slash commands can be automatically registered, but this process needs to happen after the client enters the READY state.
             // Since Global Commands take around 1 hour to register, we should use a test guild to instantly update and test our commands.
             if (Program.IsDebug())
                 await _handler.RegisterCommandsToGuildAsync(_configuration.Guilds.Test, true);
             else
                 await _handler.RegisterCommandsGloballyAsync(true);
+
+            if (false)
+            {
+                var cmds = await _client.GetGlobalApplicationCommandsAsync();
+                foreach (var cmd in cmds)
+                    await cmd.DeleteAsync();
+            }
         }
 
         private async Task HandleInteraction(SocketInteraction interaction)

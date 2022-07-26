@@ -17,7 +17,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RequireUserPermission(GuildPermission.Administrator)]
-
+    [DefaultMemberPermissions(GuildPermission.Administrator)]
     public class ChannelsModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         [Group("overview", "channel overview")]
@@ -98,6 +98,6 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
                 }
             }
         }
-
+        
     }
 }
