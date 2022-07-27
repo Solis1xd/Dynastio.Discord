@@ -18,19 +18,25 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     public class Rank : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
+        public DynastioClient Dynastio { get; set; }
 
-        [RequireAccount]
+
+        [RequireUserDynastioAccount]
         [RateLimit(3)]
         [SlashCommand("rank", "your dynast.io rank")]
-        public async Task rank([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",bool Cache = true)
+        public async Task rank([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+            bool Cache = true,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
+            var dynastioProvider =Dynastio[provider];
+
             UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
             if (!Cache) account_.Rank = new();
 
             if (account_.Rank.IsAllowedToUploadNew())
             {
-                var rank = await Context.Dynastio.Database.GetUserRanAsync(account_.Id).TryGet();
+                var rank = await dynastioProvider.GetUserRanAsync(account_.Id).TryGet();
                 if (rank == null)
                 {
                     await FollowupAsync(embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
@@ -45,7 +51,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                     {
                         using (var Avatar = SixLabors.ImageSharp.Image.Load(mem))
                         {
-                            var img = GraphicService.GetRank(Avatar, rank,user.Username,user.DiscriminatorValue);
+                            var img = GraphicService.GetRank(Avatar, rank,user.Username,user.Discriminator);
                             using (var stream = new System.IO.MemoryStream())
                             {
                                 img.SaveAsJpeg(stream);

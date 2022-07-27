@@ -16,17 +16,28 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     public class Leaderboard : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public UserService UserService { get; set; }
-        [RateLimit(100)]
+        public DynastioClient Dynastio { get; set; }
+
+        [RateLimit(200,3)]
         [SlashCommand("me", "leaderboard me")]
-        public async Task leaderboard_me(LeaderboardType leaderboard = LeaderboardType.Monthly, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "")
+        public async Task leaderboard_me(
+            LeaderboardType leaderboard = LeaderboardType.Monthly,
+            [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
+            var dynastioProvider =Dynastio[provider];
             UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
                ? Context.BotUser.GetAccount()
                : Context.BotUser.GetAccount(int.Parse(account));
 
-            var result = await Context.Dynastio.Database.GetUserSurroundingRankAsync(selectedAccount.Id);
+            var result = await dynastioProvider.GetUserSurroundingRankAsync(selectedAccount.Id);
+            if(result is null)
+            {
+                await FollowupAsync(embed:"data not found".ToWarnEmbed("Not found"));
+                return;
+            }
             UserSurroundingRankRow userSurroundingRank = leaderboard switch
             {
                 LeaderboardType.Monthly => result.Montly,
@@ -42,7 +53,14 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                 _ => null
             };
 
-            var firstUser = await Context.Dynastio.Database.GetUserRanAsync(usersSurroundingRank.First().Id);
+            var user = usersSurroundingRank.FirstOrDefault();
+            if (user is null)
+            {
+                await FollowupAsync(embed: "data not found".ToWarnEmbed("Not found"));
+                return;
+            }
+
+            var firstUser = await dynastioProvider.GetUserRanAsync(user.Id);
             int index = leaderboard switch
             {
                 LeaderboardType.Monthly => firstUser.Monthly,
@@ -62,11 +80,12 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         }
         [RateLimit(3)]
         [SlashCommand("score", "leaderboard score")]
-        public async Task LeaderboardScore(LeaderboardType leaderboard = LeaderboardType.Monthly)
+        public async Task LeaderboardScore(LeaderboardType leaderboard = LeaderboardType.Monthly,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
-            var leaderboardContent = await Context.Dynastio.Database.GetScoreLeaderboardAsync();
+            var leaderboardContent = await Dynastio[provider].GetScoreLeaderboardAsync();
             if (leaderboard == LeaderboardType.Monthly)
             {
                 leaderboardContent = leaderboardContent.Skip((int)leaderboard * 10).Take(10).ToList();
@@ -83,11 +102,11 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         }
         [RateLimit(10)]
         [SlashCommand("coin", "leaderboard coin")]
-        public async Task leaderboard_coin()
+        public async Task leaderboard_coin(DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
-            var coinboard = await Context.Dynastio.Database.GetCoinLeaderboardAsync();
+            var coinboard = await Dynastio[provider].GetCoinLeaderboardAsync();
             string content = coinboard.ToStringTable(new[] { "#", this["index"], this["coin"], this["nickname"] },
                  a => coinboard.IndexOf(a) < 5 ? "🏆" : "",
                  a => $"{(coinboard.IndexOf(a) + 1).ToRegularCounter()}",

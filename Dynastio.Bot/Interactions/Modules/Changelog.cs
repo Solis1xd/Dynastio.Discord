@@ -16,11 +16,13 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     [RateLimit(60, 5, RateLimit.RateLimitType.User)]
     public class Changelog : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
+        public DynastioClient Dynastio { get; set; }
+
         [SlashCommand("changelog", "dynast.io Changelog")]
-        public async Task changelog(string search = "txt", int page = 1)
+        public async Task changelog(string search = "txt", int page = 1, DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
-            var changelog = Context.Dynastio.Game.ChangeLog;
+            var changelog =Dynastio[provider].ChangeLog;
             try
             {
                 var pages = changelog.Split(new[] { "\n\r" }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -49,7 +51,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             }
             catch
             {
-                await FollowupAsync(Context.User.Id.ToUserMention(), embed: changelog.Substring(0,800).ToEmbed("Changelog"));
+                await FollowupAsync(Context.User.Id.ToUserMention(), embed: changelog.Substring(0, 800).ToEmbed("Changelog"));
             }
         }
         [RequireUser]

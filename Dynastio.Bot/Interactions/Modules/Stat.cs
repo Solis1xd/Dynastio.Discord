@@ -16,11 +16,15 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     public class Stat : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
+        public DynastioClient Dynastio { get; set; }
 
-        [RequireAccount]
+        [RequireUserDynastioAccount]
         [SlashCommand("stat", "stat")]
         [RateLimit(60, 2, RateLimit.RateLimitType.User)]
-        public async Task stat(StatType stat, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "", bool Cache = true)
+        public async Task stat(
+            StatType stat, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+            bool Cache = true,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
@@ -32,7 +36,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             if (!Cache) imageCacheUrl = new();
             if (result is false || result && imageCacheUrl.IsAllowedToUploadNew())
             {
-                var stat_ = await Context.Dynastio.Database.GetUserStatAsync(account_.Id).TryGet();
+                var dynastioProvider =Dynastio[provider];
+                var stat_ = await dynastioProvider.GetUserStatAsync(account_.Id).TryGet();
                 if (stat_ is null)
                 {
                     await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));

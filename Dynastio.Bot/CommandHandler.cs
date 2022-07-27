@@ -70,9 +70,8 @@ namespace Dynastio.Bot
             if (!message.HasStringPrefix(".", ref argPos)) return;
 
             var user = await _userService.GetUserAsync(message.Author.Id);
-            var provider = _dynastioclient.GetProvider(user.Settings.DynastioProvider) ?? _dynastioclient.Main;
 
-            var context = new CustomSocketCommandContext(_discord, message, guild, user, provider, locale);
+            var context = new CustomSocketCommandContext(_discord, message, guild, user, locale);
 
             await _commands.ExecuteAsync(context, argPos, _services);
         }

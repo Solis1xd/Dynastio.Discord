@@ -51,7 +51,11 @@ namespace Dynastio.Bot
             _handler.InteractionExecuted += _handler_InteractionExecuted;
         }
 
-        private async Task LogAsync(LogMessage log) => Console.WriteLine(log);
+        private Task LogAsync(LogMessage log)
+        {
+            Console.WriteLine(log);
+            return Task.CompletedTask;
+        }
 
         private async Task ReadyAsync()
         {
@@ -62,12 +66,11 @@ namespace Dynastio.Bot
             else
                 await _handler.RegisterCommandsGloballyAsync(true);
 
-            if (false)
-            {
-                var cmds = await _client.GetGlobalApplicationCommandsAsync();
-                foreach (var cmd in cmds)
-                    await cmd.DeleteAsync();
-            }
+           
+                //var cmds = await _client.GetGlobalApplicationCommandsAsync();
+                //foreach (var cmd in cmds)
+                //    await cmd.DeleteAsync();
+            
         }
 
         private async Task HandleInteraction(SocketInteraction interaction)
@@ -75,12 +78,11 @@ namespace Dynastio.Bot
             if (!InteractionUtilities.IsStaticInteractionCommand(interaction)) return;
 
             var user = await userService.GetUserAsync(interaction.User.Id);
-            var provider = _dynastClient.GetProvider(user.Settings.DynastioProvider) ?? _dynastClient.Main;
             var locale = localeService[interaction.UserLocale];
             var guild = await _guildservice.GetGuildAsync(interaction.GuildId.Value);
 
             // Create an execution context that matches the generic type parameter of your InteractionModuleBase<T> modules.
-            var context = new CustomSocketInteractionContext(_client, interaction, user, provider, locale, guild);
+            var context = new CustomSocketInteractionContext(_client, interaction, user, locale, guild);
 
             // Execute the incoming command.
             var result = await _handler.ExecuteCommandAsync(context, _services);

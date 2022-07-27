@@ -40,7 +40,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
                 }.Build());
         }
         [RateLimit(10)]
-        [RequireAccount]
+        [RequireUserDynastioAccount]
         [SlashCommand("set-default", "set an account as default account")]
         public async Task setDefault([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
         {
@@ -51,7 +51,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
             await Context.BotUser.UpdateAsync();
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
-        [RequireAccount]
+        [RequireUserDynastioAccount]
         [RateLimit(5)]
         [SlashCommand("edit", "edit your added account")]
         public async Task edit([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account, string newNickname)
@@ -68,7 +68,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
-        [RequireAccount]
+        [RequireUserDynastioAccount]
         [RateLimit(3)]
         [SlashCommand("remove", "remove a connected account")]
         public async Task remove([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
@@ -128,7 +128,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Account
                 return;
             }
 
-            Profile acc = await Dynastio.Database.GetUserProfileAsync(id).TryGet();
+            Profile acc = await Dynastio.Main.GetUserProfileAsync(id).TryGet();
             if (acc is null)
             {
                 await FollowupAsync(Context.UserMention(), embed: this["no_account_found"].ToWarnEmbed(this["no_account_found"]));

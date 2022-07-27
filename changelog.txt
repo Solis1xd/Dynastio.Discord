@@ -1,3 +1,16 @@
+0.4.7 - 27/07/2022
+- sync with game version 0.6.7
+- providers added to the slash commands
+- featured videos added to the bot
+- profile command updated to /profile picture
+- /Find and /Toplist command updated, server suggetions are based on the provider
+- new command (/profile unlocked recipes)
+- new command (/profile unlocked building)
+- new command (/profile unlocked skins)
+- new command (/profile details)
+- update to dynastio.net 2.0.4
+- global provider removed
+
 0.4.6 - 23/07/2022
 - add default user permissions
 - better edit embed builder command

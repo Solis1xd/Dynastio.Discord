@@ -18,14 +18,19 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     public class PersonalChest : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
+        public DynastioClient Dynastio { get; set; }
 
-        [RequireAccount]
+        [RequireUserDynastioAccount]
         [SlashCommand("chest", "your private chest")]
-        public async Task personalChest(bool All = false, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "", bool Cache = true)
+        public async Task personalChest(
+            bool All = false, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+            bool Cache = true,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
+            var dynastioProvider =Dynastio[provider];
             if (!All || Context.BotUser.Accounts.Count < 2)
             {
-                await _personalChest(account, Cache);
+                await _personalChest(account, Cache, dynastioProvider);
                 return;
             }
 
@@ -34,7 +39,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             if (!Cache) cache = new();
             if (cache.IsAllowedToUploadNew())
             {
-                var chests = await Context.BotUser.Accounts.GetPersonalchests(Context.Dynastio);
+                var chests = await Context.BotUser.Accounts.GetPersonalchests(dynastioProvider);
 
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
 
@@ -42,10 +47,10 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                 Context.BotUser.AllChests = new ImageCacheUrl(msg.Attachments.First().Url, 3600);
                 return;
             }
-
+           
             await FollowupAsync(embed: $"This Chest Is For {cache.UploadedAt.ToDiscordUnixTimestampFormat()}".ToEmbed("", null, cache.Url));
         }
-        private async Task _personalChest(string account = "", bool Cache = true)
+        private async Task _personalChest(string account = "", bool Cache = true, IDynastioProvider provider=null)
         {
             await DeferAsync();
             UserAccount account_ = string.IsNullOrWhiteSpace(account) 
@@ -56,7 +61,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
 
             if (account_.Chest.IsAllowedToUploadNew())
             {
-                var chest = await Context.Dynastio.Database.GetUserPersonalchestAsync(account_.Id).TryGet();
+                var chest = await provider.GetUserPersonalchestAsync(account_.Id).TryGet();
                 if (chest == null)
                 {
                     await FollowupAsync("chest not found, join the game and put something to your chest.");

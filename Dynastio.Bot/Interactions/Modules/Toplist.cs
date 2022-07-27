@@ -18,6 +18,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     public class ToplistModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
+        public DynastioClient Dynastio { get; set; }
+
         [RateLimit(10, 1, RateLimit.RateLimitType.User)]
         [SlashCommand("toplist", "a list of top players")]
         public async Task toplist(
@@ -25,11 +27,13 @@ namespace Dynastio.Bot.Interactions.SlashCommands
               [MaxValue(50)] int take = 25,
               SortType sort = SortType.Score,
               Map Map = Map.Disable,
-              int page = 1)
+              int page = 1,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
+            var dynastioProvider = Dynastio[provider];
 
-            var players = Context.Dynastio.Game.OnlinePlayers.Where(a => a.Parent.IsPrivate == false).ToList() ?? null;
+            var players = dynastioProvider.OnlinePlayers.Where(a => a.Parent.IsPrivate == false).ToList() ?? null;
             if (players == null)
             {
                 await FollowupAsync(embed: "No any online server found.".ToWarnEmbed("Not Found !"));

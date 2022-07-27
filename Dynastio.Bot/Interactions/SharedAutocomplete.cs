@@ -38,7 +38,11 @@ namespace Dynastio.Bot
                 List<AutocompleteResult> results = new();
 
                 string match = autocompleteInteraction.Data.Current.Value.ToString();
-                var servers = Dynastio.Game.OnlineServers.Where(a => a.Label.ToLower().Contains(match)).Take(25).ToList();
+
+                var provider_ = autocompleteInteraction.Data.Options.FirstOrDefault(a => a.Name == "provider");
+                string provider = provider_ != null ? provider_.Value.ToString() : DynastioProviderType.Main.ToString();
+
+                var servers = Dynastio[provider].OnlineServers.Where(a => a.Label.ToLower().Contains(match)).Take(25).ToList();
 
                 foreach (var server in servers)
                 {

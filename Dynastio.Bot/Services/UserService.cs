@@ -68,7 +68,7 @@ namespace Dynastio.Bot
         }
         async Task<User> GetNewUserAsync(ulong id)
         {
-            bool result = await dynastioClient.Database.IsUserAccountExistAsync("discord:" + id);
+            bool result = await dynastioClient.Main.IsUserAccountExistAsync("discord:" + id);
             var user = new User(this)
             {
                 Id = id,

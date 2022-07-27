@@ -144,7 +144,7 @@ namespace Dynastio.Bot
             }
             return image;
         }
-        public Image GetRank(Image avatar, UserRank rank, string nickname, int discordTag)
+        public Image GetRank(Image avatar, UserRank rank, string nickname, string discordTag)
         {
             Image<Rgba32> image = new(934, 282);
             avatar.Mutate(x => x.Resize(162, 162));
@@ -154,7 +154,7 @@ namespace Dynastio.Bot
             image.Mutate(x => x.DrawImage(background, new Point(0, 0), 1f));
 
             image.Mutate(x => x.DrawText(nickname, new Font(fontFamily, 60, FontStyle.Bold), Color.Orange, new PointF() { X = 250, Y = 140 }));
-            image.Mutate(x => x.DrawText("#" + discordTag.ToString(), new Font(fontFamily, 35, FontStyle.Bold), Color.Orange, new PointF() { X = 250 + (nickname.Length * 32), Y = 150 + 10 }));
+            image.Mutate(x => x.DrawText(discordTag, new Font(fontFamily, 35, FontStyle.Bold), Color.Orange, new PointF() { X = 250 + (nickname.Length * 32), Y = 150 + 10 }));
 
             var pointRank = new PointF() { X = 820 - (rank.Monthly.ToString().Length * 35), Y = 60 };
             image.Mutate(x => x.DrawText("#" + rank.Monthly.ToString(), new Font(fontFamily, 72, FontStyle.Bold), Color.White, pointRank));

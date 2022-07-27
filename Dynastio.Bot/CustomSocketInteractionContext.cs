@@ -28,8 +28,8 @@ namespace Dynastio.Bot
         //
         //   interaction:
         //     The underlying interaction
-        public CustomSocketInteractionContext(DiscordSocketClient client, SocketInteraction interaction, User user, IDynastioProvider Dynastio, Locale Locale, Guild BotGuild)
-            : base(client, interaction, user, Dynastio, Locale,BotGuild)
+        public CustomSocketInteractionContext(DiscordSocketClient client, SocketInteraction interaction, User user, Locale Locale, Guild BotGuild)
+            : base(client, interaction, user, Locale,BotGuild)
         {
         }
     }
@@ -40,7 +40,6 @@ namespace Dynastio.Bot
     {
         Guild BotGuild { get; }
         User BotUser { get; }
-        IDynastioProvider Dynastio { get; }
         Locale Locale { get; }
     }
     //
@@ -49,7 +48,6 @@ namespace Dynastio.Bot
     public class CustomSocketInteractionContext<TInteraction> : ICustomInteractionContext, IRouteMatchContainer where TInteraction : SocketInteraction
     {
         public Guild BotGuild { get; }
-        public IDynastioProvider Dynastio { get; }
 
         public User BotUser { get; }
         //
@@ -107,7 +105,7 @@ namespace Dynastio.Bot
         //
         //   interaction:
         //     The underlying interaction.
-        public CustomSocketInteractionContext(DiscordSocketClient client, TInteraction interaction, User botUser, IDynastioProvider dynastio, Locale locale, Guild botGuild)
+        public CustomSocketInteractionContext(DiscordSocketClient client, TInteraction interaction, User botUser, Locale locale, Guild botGuild)
         {
             Client = client;
             Channel = interaction.Channel;
@@ -115,7 +113,6 @@ namespace Dynastio.Bot
             User = interaction.User;
             Interaction = interaction;
             BotUser = botUser;
-            Dynastio = dynastio;
             Locale = locale;
             BotGuild = botGuild;
         }

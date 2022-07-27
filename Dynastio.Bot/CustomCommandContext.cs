@@ -23,7 +23,6 @@ namespace Dynastio.Bot
     {
         Guild BotGuild { get; }
         User BotUser { get; }
-        IDynastioProvider Dynastio { get; }
         Locale Locale { get; }
     }
 
@@ -48,7 +47,6 @@ namespace Dynastio.Bot
 
         public User BotUser { get; }
 
-        public IDynastioProvider Dynastio { get; }
 
         public Locale Locale { get; }
 
@@ -57,7 +55,7 @@ namespace Dynastio.Bot
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="msg">The underlying message.</param>
-        public CustomCommandContext(IDiscordClient client, IUserMessage msg, Guild guild, User user, IDynastioProvider dynastio, Locale locale)
+        public CustomCommandContext(IDiscordClient client, IUserMessage msg, Guild guild, User user,  Locale locale)
         {
             Client = client;
             Guild = (msg.Channel as IGuildChannel)?.Guild;
@@ -66,7 +64,6 @@ namespace Dynastio.Bot
             Message = msg;
             this.BotGuild = guild;
             this.BotUser = user;
-            this.Dynastio = dynastio;
             this.Locale = locale;
         }
     }
@@ -118,8 +115,6 @@ namespace Dynastio.Bot
 
         public User BotUser { get; }
 
-        public IDynastioProvider Dynastio { get; }
-
         public Locale Locale { get; }
 
         //
@@ -133,7 +128,7 @@ namespace Dynastio.Bot
         //
         //   msg:
         //     The underlying message.
-        public CustomSocketCommandContext(DiscordSocketClient client, SocketUserMessage msg, Guild guild, User user, IDynastioProvider dynastio, Locale locale)
+        public CustomSocketCommandContext(DiscordSocketClient client, SocketUserMessage msg, Guild guild, User user, Locale locale)
         {
             Client = client;
             Guild = (msg.Channel as SocketGuildChannel)?.Guild;
@@ -142,7 +137,6 @@ namespace Dynastio.Bot
             Message = msg;
             this.BotGuild = guild;
             this.BotUser = user;
-            this.Dynastio = dynastio;
             this.Locale = locale;
         }
     }

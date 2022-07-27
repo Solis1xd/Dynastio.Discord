@@ -54,9 +54,6 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             componenets.WithButton(this["events"], "menu.events", ButtonStyle.Secondary, null, null, false, 2);
             componenets.WithButton(this["changes"], "menu.changelog:false:1:txt", ButtonStyle.Secondary, new Emoji("📰"), null, false, 2);
 
-            bool provider = Context.BotUser.Settings.DynastioProvider == "main";
-            componenets.WithButton($"{this["provider"]} : {Context.BotUser.Settings.DynastioProvider}", $"menu.provider:{(provider ? "main" : "nightly")}", provider ? ButtonStyle.Success : ButtonStyle.Danger, new Emoji("⚒"), null, false, 3);
-
             componenets.WithButton(this["youtube_channel"], null, ButtonStyle.Link, new Emoji("📺"), Configuration.YoutubeLink, false, 3);
             componenets.WithButton(this["cancel"], $"shared.close", ButtonStyle.Danger, new Emoji("🛠"), null, false, 3);
 
@@ -81,13 +78,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             await DeferAsync();
             await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /toplist".ToEmbed("use /toplist"));
         }
-        [RequireUser]
-        [ComponentInteraction("menu.provider:*")]
-        public async Task Provider(string type)
-        {
-            await DeferAsync();
-            await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /provider".ToEmbed("use /provider"));
-        }
+       
         [RequireUser]
         [ComponentInteraction("menu.players:*:*:*:*:*")]
         public async Task Players(string sort = "score", string filter = "default", string Query = "default", int Page = 1, int Take = 24)
@@ -115,7 +106,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /profile".ToEmbed("use /profile"));
         }
         [RequireUser]
-        [RequireAccount]
+        [RequireUserDynastioAccount]
         [ComponentInteraction("menu.profile:*")]
         public async Task Profile(string value)
         {
@@ -123,7 +114,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /profile".ToEmbed("use /profile"));
         }
         [RequireUser]
-        [RequireAccount()]
+        [RequireUserDynastioAccount()]
         [ComponentInteraction("menu.chest:*")]
         public async Task Chest(string value)
         {
@@ -132,7 +123,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         }
 
         [RequireUser]
-        [RequireAccount()]
+        [RequireUserDynastioAccount()]
         [ComponentInteraction("menu.stat:*")]
         public async Task Stat(string value)
         {
@@ -140,7 +131,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /stat".ToEmbed("use /stat"));
         }
         [RequireUser]
-        [RequireAccount] 
+        [RequireUserDynastioAccount] 
         [ComponentInteraction("menu.rank:*")]
         public async Task Rank(string value)
         {

@@ -111,7 +111,7 @@ namespace Dynastio.Bot
             }
         }
 
-        public static async Task<string?> GetTextAsync(CancellationToken cancellation)
+        public static async Task<string> GetTextAsync(CancellationToken cancellation)
         {
             if (!IsClipboardFormatAvailable(cfUnicodeText))
             {
@@ -122,7 +122,7 @@ namespace Dynastio.Bot
             return InnerGet();
         }
 
-        public static string? GetText()
+        public static string GetText()
         {
             if (!IsClipboardFormatAvailable(cfUnicodeText))
             {
@@ -133,7 +133,7 @@ namespace Dynastio.Bot
             return InnerGet();
         }
 
-        static string? InnerGet()
+        static string InnerGet()
         {
             IntPtr handle = default;
 

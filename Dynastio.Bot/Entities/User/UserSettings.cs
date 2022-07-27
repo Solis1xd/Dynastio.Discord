@@ -11,7 +11,6 @@ namespace Dynastio.Bot
     [BsonIgnoreExtraElements]
     public class UserSettings
     {
-        public string DynastioProvider { get; set; } = "Main";
         public bool IsPChestPrivate { get; set; }
         public DateTime PchestUpdatedAt { get; set; } = DateTime.MinValue;
         public UserProfileStyle ProfileStyle { get; set; } = UserProfileStyle.Default;

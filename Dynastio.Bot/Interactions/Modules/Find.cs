@@ -19,7 +19,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
     public class FindModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
-
+        public DynastioClient Dynastio { get; set; }
 
         [RateLimit(10, 1, RateLimit.RateLimitType.User)]
         [SlashCommand("players", "a list of online players")]
@@ -33,11 +33,12 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             int MaxLevel = int.MaxValue,
             int MinScore = 0,
             int MaxScore = int.MaxValue,
-            int page = 1)
+            int page = 1,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
-
-            var players = Context.Dynastio.Game.OnlinePlayers.ToList() ?? null;
+            var dyanstioProvider =Dynastio[provider];
+            var players = dyanstioProvider.OnlinePlayers.ToList() ?? null;
             if (players == null)
             {
                 await FollowupAsync(embed: "No any online server found.".ToWarnEmbed("Not Found !"));
@@ -83,8 +84,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                 a => a.Team.RemoveLines().Summarizing(10),
                 a => a.Nickname.RemoveLines().Summarizing(16)).ToMarkdown();
 
-            string content1 = this["total_servers:*", Context.Dynastio.Game.OnlineServers.Count] + " | " +
-                              this["total_players:*", Context.Dynastio.Game.OnlinePlayers.Count] + "\n" +
+            string content1 = this["total_servers:*", dyanstioProvider.OnlineServers.Count] + " | " +
+                              this["total_players:*", dyanstioProvider.OnlinePlayers.Count] + "\n" +
                               this["page:*", $"{page}/{(players.Count() / take)}"].Bold() + "\n" +
                               this["closes:*", 50.ToDiscordUnixTimeFromat()];
 

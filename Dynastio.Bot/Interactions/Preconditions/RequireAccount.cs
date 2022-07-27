@@ -11,7 +11,7 @@ using Dynastio.Bot;
 
 namespace Discord.Interactions
 {
-    public class RequireAccountAttribute : PreconditionAttribute
+    public class RequireUserDynastioAccountAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
