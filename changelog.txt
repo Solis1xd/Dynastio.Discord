@@ -1,4 +1,4 @@
-0.4.7 - 28/07/2022
+0.4.8 - 28/07/2022
 - new command (/server)
 - new command (/user chest)
 - new command (/user profile)
