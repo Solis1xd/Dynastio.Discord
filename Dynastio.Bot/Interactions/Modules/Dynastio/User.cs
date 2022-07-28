@@ -88,6 +88,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             {
                 var botUser = await UserService.GetUserAsync(user.Id);
                 var chests = await botUser.Accounts.GetPersonalchests(dynastioProvider);
+                if(chests == null || chests.Count < 1)
+                {
+                    await FollowupAsync("chest not found.");
+                    return;
+                }
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
                 await FollowupWithFileAsync(image, "chest.jpeg");
             }

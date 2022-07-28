@@ -33,7 +33,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             if (All)
             {
                 var chests = await Context.BotUser.Accounts.GetPersonalchests(dynastioProvider);
-                var image = GraphicService.GetPersonalChests(chests.ToArray());
+                if (chests == null || chests.Count < 1)
+                {
+                    await FollowupAsync("chest not found.");
+                    return;
+                }
+                    var image = GraphicService.GetPersonalChests(chests.ToArray());
                 await FollowupWithFileAsync(image, "chest.jpeg");
             }
             else
