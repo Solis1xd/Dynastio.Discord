@@ -24,13 +24,13 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [SlashCommand("profile", "your dynastio profile")]
         public async Task profile(
             IGuildUser user = null,
-            ulong userId = 0,
+            string dynastId = "",
             [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
                 DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
-            if (user == null && userId == 0)
+            if (user == null && dynastId == "")
             {
                 await FollowupAsync("Id or User can't be null.");
                 return;
@@ -38,11 +38,21 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 
             var dynastioProvider = Dynastio[provider];
 
-            var botUser = await UserService.GetUserAsync(user?.Id ?? userId);
-
-            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
+            UserAccount selectedAccount;
+            if (dynastId == "")
+            {
+                var botUser = await UserService.GetUserAsync(user.Id);
+                selectedAccount = string.IsNullOrWhiteSpace(account)
                 ? botUser.GetAccount()
                 : botUser.GetAccount(int.Parse(account));
+            }
+            else
+            {
+                selectedAccount = new UserAccount()
+                {
+                    Id = dynastId,
+                };
+            }
 
             var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id).TryGet();
             if (profile == null)
@@ -51,44 +61,55 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 return;
             }
 
-           var image = GraphicService.GetProfile(profile);
+            var image = GraphicService.GetProfile(profile);
 
-           await FollowupWithFileAsync(image, "profile.jpeg");
+            await FollowupWithFileAsync(image, "profile.jpeg");
         }
         [RateLimit(70, 3, RateLimit.RateLimitType.User)]
         [SlashCommand("chest", "your dynastio chest")]
         public async Task chest(
-            IGuildUser user=null,
-            ulong userId = 0,
+            IGuildUser user = null,
+           string dynastId = "",
             bool All = false,
             [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
                 DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
-            if (user == null && userId == 0)
+            if (user == null && dynastId == "")
             {
                 await FollowupAsync("Id or User can't be null.");
                 return;
             }
 
-            var botUser = await UserService.GetUserAsync(user?.Id ?? userId);
-
             var dynastioProvider = Dynastio[provider];
 
             if (All)
             {
+                var botUser = await UserService.GetUserAsync(user.Id);
                 var chests = await botUser.Accounts.GetPersonalchests(dynastioProvider);
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
                 await FollowupWithFileAsync(image, "chest.jpeg");
             }
             else
             {
-                UserAccount account_ = string.IsNullOrWhiteSpace(account)
-                        ? botUser.GetAccount()
-                        : botUser.GetAccount(int.Parse(account));
+                UserAccount selectedAccount;
+                if (dynastId == "")
+                {
+                    var botUser = await UserService.GetUserAsync(user.Id);
+                    selectedAccount = string.IsNullOrWhiteSpace(account)
+                    ? botUser.GetAccount()
+                    : botUser.GetAccount(int.Parse(account));
+                }
+                else
+                {
+                    selectedAccount = new UserAccount()
+                    {
+                        Id = dynastId,
+                    };
+                }
 
-                var chest = await dynastioProvider.GetUserPersonalchestAsync(account_.Id).TryGet();
+                var chest = await dynastioProvider.GetUserPersonalchestAsync(selectedAccount.Id).TryGet();
                 if (chest == null)
                 {
                     await FollowupAsync("chest not found, join the game and put something to your chest.");
@@ -105,30 +126,44 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [RateLimit(70, 2, RateLimit.RateLimitType.User)]
         public async Task stat(
            StatType stat,
-           IGuildUser user = null, ulong userId = 0,
+           IGuildUser user = null,
+           string dynastId = "",
            [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
 
-            if (user == null && userId == 0)
+            if (user == null && dynastId == "")
             {
                 await FollowupAsync("Id or User can't be null.");
                 return;
             }
 
-            var botUser = await UserService.GetUserAsync(user?.Id ?? userId);
+            UserAccount selectedAccount;
+            if (dynastId == "")
+            {
+                var botUser = await UserService.GetUserAsync(user.Id);
+                selectedAccount = string.IsNullOrWhiteSpace(account)
+                ? botUser.GetAccount()
+                : botUser.GetAccount(int.Parse(account));
+            }
+            else
+            {
+                selectedAccount = new UserAccount()
+                {
+                    Id = dynastId,
+                };
+            }
 
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? botUser.GetAccount() : botUser.GetAccount(int.Parse(account));
             string type = stat == StatType.Craft || stat == StatType.Gather || stat == StatType.Shop ? "item" : "entity";
             string property = stat.ToString().ToLower();
 
 
             var dynastioProvider = Dynastio[provider];
-            var stat_ = await dynastioProvider.GetUserStatAsync(account_.Id).TryGet();
+            var stat_ = await dynastioProvider.GetUserStatAsync(selectedAccount.Id).TryGet();
             if (stat_ is null)
             {
-                await FollowupAsync(botUser.Id.ToUserMention(), embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
+                await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
                 return;
             }
             var image = type switch
@@ -150,7 +185,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 _ => null
             };
 
-            await FollowupWithFileAsync(image, "stat.jpeg", botUser.Id.ToUserMention());
+            await FollowupWithFileAsync(image, "stat.jpeg", Context.User.Id.ToUserMention());
         }
 
 
