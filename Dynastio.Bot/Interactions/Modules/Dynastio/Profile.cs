@@ -8,13 +8,11 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireUserDynastioAccount]
     [RequireContext(ContextType.Guild)]
-    [RequireBotPermission(ChannelPermission.AttachFiles)]
-    [RequireBotPermission(ChannelPermission.SendMessages)]
-    [RequireBotPermission(ChannelPermission.EmbedLinks)]
+    [RequireBotPermission(ChannelPermission.AttachFiles | ChannelPermission.SendMessages | ChannelPermission.EmbedLinks)]
     [Group("profile", "dynastio profile")]
     public class ProfileSlashCommand : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
@@ -34,24 +32,14 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                 ? Context.BotUser.GetAccount()
                 : Context.BotUser.GetAccount(int.Parse(account));
 
-            if (!Cache) selectedAccount.Profile = new();
-
-            if (selectedAccount.Profile.IsAllowedToUploadNew())
+            var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id).TryGet();
+            if (profile == null)
             {
-                var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id).TryGet();
-                if (profile == null)
-                {
-                    await FollowupAsync("data not found.");
-                    return;
-                }
-                var image = GraphicService.GetProfile(profile);
-                var msg = await FollowupWithFileAsync(image, "profile.jpeg");
-                selectedAccount.Profile = new ImageCacheUrl(msg.Attachments.First().Url, 3600);
+                await FollowupAsync("data not found.");
+                return;
             }
-            else
-            {
-                await FollowupAsync(embed: $"This Profile Is For {selectedAccount.Profile.UploadedAt.ToDiscordUnixTimestampFormat()}".ToEmbed("", null, selectedAccount.Profile.Url));
-            }
+            var image = GraphicService.GetProfile(profile);
+            var msg = await FollowupWithFileAsync(image, "profile.jpeg");
         }
 
         [RateLimit(150, 2)]
@@ -133,7 +121,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                     : Context.BotUser.GetAccount(int.Parse(account));
 
                 var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id);
-                var content = profile.UnlockedRecipes?.ToStringTable(new string[] { "#","Unlocked Recipes" },
+                var content = profile.UnlockedRecipes?.ToStringTable(new string[] { "#", "Unlocked Recipes" },
                     a => profile.UnlockedRecipes.IndexOf(a).ToRegularCounter(),
                     a => a.ToString()) ?? "no any unlocked recipes.";
                 await FollowupAsync(embed: content.ToMarkdown().ToEmbed($"Profile {selectedAccount.Nickname}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl()));

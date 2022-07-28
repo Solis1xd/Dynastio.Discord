@@ -8,7 +8,7 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
     [RequireContext(ContextType.Guild)]
@@ -22,7 +22,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         public async Task changelog(string search = "txt", int page = 1, DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
-            var changelog =Dynastio[provider].ChangeLog;
+            var changelog = Dynastio[provider].ChangeLog;
             try
             {
                 var pages = changelog.Split(new[] { "\n\r" }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -31,7 +31,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
 
                 var componenets = new ComponentBuilder();
                 componenets.WithButton(this["previous"], $"changelog.buttons:{search}:{page - 1}", ButtonStyle.Primary, new Emoji("⏪"), null, page < 2, 0);
-                componenets.WithButton(this["next"], $"changelog.buttons:{search}:{page + 1}", ButtonStyle.Primary, new Emoji("⏩"), null, (pages.Count <= (page)), 0);
+                componenets.WithButton(this["next"], $"changelog.buttons:{search}:{page + 1}", ButtonStyle.Primary, new Emoji("⏩"), null, pages.Count <= page, 0);
 
                 var content = pages.Skip(page - 1).FirstOrDefault() ?? this["data.not_found.description"];
                 var contentLiens = content.Split("\n");

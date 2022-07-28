@@ -9,7 +9,7 @@ using Dynastio.Net;
 
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
     [RequireContext(ContextType.Guild)]
@@ -60,7 +60,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             var map = Map == Map.Enable ? GraphicService.GetMap(players1) : null;
 
             var embeds = map != null ?
-                new Embed[] { content.ToEmbed(), "".ToSuccessfulEmbed(ImageUrl: "attachment://map.jpeg") } :
+                new Embed[] { content.ToEmbed(), "".ToEmbed(ImageUrl: "attachment://map.jpeg") } :
                 new Embed[] { content.ToEmbed() };
 
             var msg = map != null ?

@@ -8,7 +8,7 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.EmbedLinks)]

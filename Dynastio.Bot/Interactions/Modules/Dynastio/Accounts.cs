@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynastio.Bot.Interactions.SlashCommands.Account
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]

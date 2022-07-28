@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
 {
-    [Group("server", "server commands")]
+    [Group("guild", "server commands")]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RequireUserPermission(GuildPermission.Administrator)]

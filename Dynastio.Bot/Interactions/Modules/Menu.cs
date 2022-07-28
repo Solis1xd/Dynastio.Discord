@@ -12,7 +12,7 @@ using Color = Discord.Color;
 using System.Linq;
 using Dynastio.Bot.Extensions;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
     [RequireUsageTime(50)]
@@ -78,7 +78,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             await DeferAsync();
             await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /toplist".ToEmbed("use /toplist"));
         }
-       
+
         [RequireUser]
         [ComponentInteraction("menu.players:*:*:*:*:*")]
         public async Task Players(string sort = "score", string filter = "default", string Query = "default", int Page = 1, int Take = 24)
@@ -131,7 +131,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             await (Context.Interaction as SocketMessageComponent).Message.ModifyToEmbed("This command changed to /stat".ToEmbed("use /stat"));
         }
         [RequireUser]
-        [RequireUserDynastioAccount] 
+        [RequireUserDynastioAccount]
         [ComponentInteraction("menu.rank:*")]
         public async Task Rank(string value)
         {

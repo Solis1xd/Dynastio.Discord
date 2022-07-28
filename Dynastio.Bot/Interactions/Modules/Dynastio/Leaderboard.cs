@@ -8,7 +8,7 @@ using Discord;
 using Dynastio.Net;
 
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
@@ -18,7 +18,8 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         public UserService UserService { get; set; }
         public DynastioClient Dynastio { get; set; }
 
-        [RateLimit(200,3)]
+        [RateLimit(200, 3)]
+        [RequireUserDynastioAccount]
         [SlashCommand("me", "leaderboard me")]
         public async Task leaderboard_me(
             LeaderboardType leaderboard = LeaderboardType.Monthly,
@@ -27,15 +28,16 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         {
             await DeferAsync();
 
-            var dynastioProvider =Dynastio[provider];
+            var dynastioProvider = Dynastio[provider];
+
             UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
                ? Context.BotUser.GetAccount()
                : Context.BotUser.GetAccount(int.Parse(account));
 
             var result = await dynastioProvider.GetUserSurroundingRankAsync(selectedAccount.Id);
-            if(result is null)
+            if (result is null)
             {
-                await FollowupAsync(embed:"data not found".ToWarnEmbed("Not found"));
+                await FollowupAsync(embed: "data not found".ToWarnEmbed("Not found"));
                 return;
             }
             UserSurroundingRankRow userSurroundingRank = leaderboard switch
@@ -111,7 +113,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                  a => coinboard.IndexOf(a) < 5 ? "🏆" : "",
                  a => $"{(coinboard.IndexOf(a) + 1).ToRegularCounter()}",
                  a => $"{a.Coin.Metric()}",
-                 a => $"{(a.Id.Contains("discord") ? this.Context.Client.GetUser(ulong.Parse(a.Id.Remove("discord:")))?.Username ?? "Discord User" : "Unknown")}");
+                 a => $"{(a.Id.Contains("discord") ? Context.Client.GetUser(ulong.Parse(a.Id.Remove("discord:")))?.Username ?? "Discord User" : "Unknown")}");
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: content.ToMarkdown().ToEmbed(this["leaderboard"] + " " + this["coin"]));
         }

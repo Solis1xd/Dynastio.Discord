@@ -9,14 +9,13 @@ using Dynastio.Net;
 
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.AttachFiles)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    [Group("find", "find data")]
-    public class FindModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
+    public class PlayersModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public GraphicService GraphicService { get; set; }
         public DynastioClient Dynastio { get; set; }
@@ -37,7 +36,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
             DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
-            var dyanstioProvider =Dynastio[provider];
+            var dyanstioProvider = Dynastio[provider];
             var players = dyanstioProvider.OnlinePlayers.ToList() ?? null;
             if (players == null)
             {
@@ -52,7 +51,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
                 a.Score > MinScore && a.Score < MaxScore
                 ).ToList();
 
-            if (filter != FilterType.All) players = players.Where(a => (filter == FilterType.PrivateServer) ? a.Parent.IsPrivate : !a.Parent.IsPrivate).ToList();
+            if (filter != FilterType.All) players = players.Where(a => filter == FilterType.PrivateServer ? a.Parent.IsPrivate : !a.Parent.IsPrivate).ToList();
 
             switch (sort)
             {
@@ -86,21 +85,21 @@ namespace Dynastio.Bot.Interactions.SlashCommands
 
             string content1 = this["total_servers:*", dyanstioProvider.OnlineServers.Count] + " | " +
                               this["total_players:*", dyanstioProvider.OnlinePlayers.Count] + "\n" +
-                              this["page:*", $"{page}/{(players.Count() / take)}"].Bold() + "\n" +
+                              this["page:*", $"{page}/{players.Count() / take}"].Bold() + "\n" +
                               this["closes:*", 50.ToDiscordUnixTimeFromat()];
 
             var map = Map == Map.Enable ? GraphicService.GetMap(players1) : null;
 
 
             var embeds = map != null ?
-                new Embed[] { content.ToEmbed(), "".ToSuccessfulEmbed(ImageUrl: "attachment://map.jpeg") } :
+                new Embed[] { content.ToEmbed(), "".ToEmbed(ImageUrl: "attachment://map.jpeg") } :
                 new Embed[] { content.ToEmbed() };
 
             var msg = map != null ?
                 await FollowupWithFileAsync(map, "map.jpeg", Context.User.Id.ToUserMention(), embeds) :
                 await FollowupAsync(Context.User.Id.ToUserMention(), embeds);
         }
-      
+
         public enum SortType
         {
             Score,

@@ -19,7 +19,6 @@ namespace Dynastio.Bot
         {
             _userManager = userManager;
         }
-        [BsonIgnore] public ImageCacheUrl AllChests { get; set; } = new();
         public ulong Id { get; set; }
 
         [BsonElement("GameAccounts")]

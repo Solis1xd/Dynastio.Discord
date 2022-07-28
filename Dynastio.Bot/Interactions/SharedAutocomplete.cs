@@ -14,16 +14,23 @@ namespace Dynastio.Bot
     {
         public class AccountAutocompleteHandler : AutocompleteHandler
         {
+            public UserService UserService { get; set; }
             public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
             {
                 List<AutocompleteResult> results;
 
                 string match = autocompleteInteraction.Data.Current.Value.ToString();
                 var all = autocompleteInteraction.Data.Options.Where(a => a.Name == "all").FirstOrDefault();
+                var userParam = autocompleteInteraction.Data.Options.Where(a => a.Name == "user").FirstOrDefault();
 
-                results = (all == null || (bool)all.Value == false) ?
-                AutocompleteUtilities.Parse((context as ICustomInteractionContext).BotUser.Accounts.Where(a => a.Nickname.Contains(match)).ToList()) :
-                new List<AutocompleteResult>() { new AutocompleteResult() { Name = "All", Value = "0" } };
+                User user = (userParam == null || string.IsNullOrEmpty((string)userParam.Value))
+                    ? (context as ICustomInteractionContext).BotUser
+                    : await UserService.GetUserAsync(ulong.Parse((string)userParam.Value));
+
+
+               results = (all == null || (bool)all.Value == false)
+                ? AutocompleteUtilities.Parse(user.Accounts.Where(a => a.Nickname.Contains(match)).ToList())
+                : new List<AutocompleteResult>() { new AutocompleteResult() { Name = "All", Value = "0" } };
 
                 // max - 25 suggestions at a time (API limit)
                 return await Task.FromResult(AutocompletionResult.FromSuccess(results.Take(25)));
@@ -49,7 +56,7 @@ namespace Dynastio.Bot
                     results.Add(new AutocompleteResult()
                     {
                         Name = server.Label.Summarizing(20),
-                        Value = server.Label.Summarizing(60, false)
+                        Value = server.Label.Summarizing(30, false)
                     });
                 }
                 // max - 25 suggestions at a time (API limit)

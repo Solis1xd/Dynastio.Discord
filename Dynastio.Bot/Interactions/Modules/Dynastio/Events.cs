@@ -8,7 +8,7 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.SlashCommands
+namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
     [RequireContext(ContextType.Guild)]
@@ -23,7 +23,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands
         {
             await DeferAsync();
             server = server.ToLower();
-            var onlineServers =Dynastio[provider].OnlineServers.Where(a => !a.IsPrivate && a.Label.ToLower().Contains(server)).ToList();
+            var onlineServers = Dynastio[provider].OnlineServers.Where(a => !a.IsPrivate && a.Label.ToLower().Contains(server)).ToList();
             var events = onlineServers.SelectMany(a => a.Events).GroupBy(a => a.id).ToList();
             string content = events.ToStringTable(new string[] { "Event", "Coef", "Started At", "End At", "Servers" },
                 a => a.First().kind.type,

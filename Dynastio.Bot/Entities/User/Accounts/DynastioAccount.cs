@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynastio.Net;
+using Dynastio.Bot.Interactions.Modules.Dynastio;
 
 namespace Dynastio.Bot
 {
@@ -20,10 +21,6 @@ namespace Dynastio.Bot
         public DateTime AddedAt { get; set; }
         public bool IsDefault { get; set; } = false;
 
-        [BsonIgnore] public ImageCacheUrl Profile { get; set; } = new();
-        [BsonIgnore] public Dictionary<Interactions.SlashCommands.Stat.StatType, ImageCacheUrl> Stat { get; set; } = new();
-        [BsonIgnore] public ImageCacheUrl Chest { get; set; } = new();
-        [BsonIgnore] public ImageCacheUrl Rank { get; set; } = new();
 
         public string GetAccountService() => Id.Split(":")[0];
 

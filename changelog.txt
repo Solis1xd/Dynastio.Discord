@@ -1,9 +1,15 @@
+0.4.7 - 28/07/2022
+- new command (/server)
+- new command (/user chest)
+- new command (/user profile)
+- new command (/user stat)
+
 0.4.7 - 27/07/2022
 - sync with game version 0.6.7
 - providers added to the slash commands
 - featured videos added to the bot
 - profile command updated to /profile picture
-- /Find and /Toplist command updated, server suggetions are based on the provider
+- /find and /toplist command updated, server suggetions are based on the provider
 - new command (/profile unlocked recipes)
 - new command (/profile unlocked building)
 - new command (/profile unlocked skins)
