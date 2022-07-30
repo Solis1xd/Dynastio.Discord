@@ -15,7 +15,8 @@ namespace Discord.Interactions
     {
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
-            if ((context as ICustomInteractionContext).BotUser.GetAccount() is null)
+            var accounts = (context as ICustomInteractionContext).BotUser.Accounts;
+            if (accounts is null || accounts.Count == 0)
                 return Task.FromResult(PreconditionResult.FromError(this.ErrorMessage ?? ((ICustomInteractionContext)context).Locale["require_account"]));
 
             return Task.FromResult(PreconditionResult.FromSuccess());

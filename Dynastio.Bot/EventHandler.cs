@@ -90,11 +90,11 @@ namespace Dynastio.Bot
             {
                 if (arg.Guild.Id == _configuration.Guilds.Main) return;
 
-                await arg.SendMessageAsync(_configuration.Guilds.InviteLinkMain, embed: "".ToEmbed(ImageUrl: img),
+                await arg.SendMessageAsync(_configuration.Guilds.InviteLinkMain, embed: "".ToEmbed(imageUrl: img),
                 components: new ComponentBuilder()
                             .WithButton("Как взломать монеты ?", null, ButtonStyle.Link, null, _configuration.YoutubeLink)
                             .WithButton("How To Hack Dynast.io ?", null, ButtonStyle.Link, null, _configuration.YoutubeLink)
-                            .WithButton("Official Dynast.io Channel", null, ButtonStyle.Link, null, _configuration.YoutubeLink)
+                            .WithButton("Official Dynast.io Channel", null, ButtonStyle.Link, null, _configuration.Guilds.InviteLinkMain)
                 .Build());
             }
             catch { }

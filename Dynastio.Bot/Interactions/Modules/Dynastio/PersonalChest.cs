@@ -30,15 +30,15 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             await DeferAsync();
             var dynastioProvider = Dynastio[provider];
 
-            if (All)
+            if (All && Context.BotUser.Accounts.Count > 1)
             {
                 var chests = await Context.BotUser.Accounts.GetPersonalchests(dynastioProvider);
-                if (chests == null || chests.Count < 1)
+                if (chests == null || chests.Count == 0)
                 {
                     await FollowupAsync("chest not found.");
                     return;
                 }
-                    var image = GraphicService.GetPersonalChests(chests.ToArray());
+                var image = GraphicService.GetPersonalChests(chests.ToArray());
                 await FollowupWithFileAsync(image, "chest.jpeg");
             }
             else

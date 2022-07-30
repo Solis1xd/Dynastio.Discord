@@ -42,19 +42,20 @@ namespace Dynastio.Bot
             _Is10TopHonorUpdated = true;
             return users;
         }
-        public async Task<User> GetUserAsync(ulong Id)
+        public async Task<User> GetUserAsync(ulong Id, bool New = true)
         {
             User user = users.FirstOrDefault(x => x.Id == Id);
             if (user is null)
             {
                 user = await mongo.GetUserAsync(Id);
 
-                if (user is null)
+                if (user is null && New is true)
                 {
                     user = await GetNewUserAsync(Id);
                     await mongo.InsertAsync(user);
                 }
-                Cache(user);
+                if (user != null)
+                    Cache(user);
             }
             return user;
         }

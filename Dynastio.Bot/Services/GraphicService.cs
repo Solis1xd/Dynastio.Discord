@@ -87,7 +87,7 @@ namespace Dynastio.Bot
 
                     var point = new PointF() { X = p.X, Y = p.Y };
                     points.Add(point);
-                    image.Mutate(x => x.DrawText(p.Nickname.Summarizing(16).RemoveLines(), new Font(fontFamily, 11, FontStyle.Regular), Color.Orange, point));
+                    image.Mutate(x => x.DrawText(StringExtensions.RemoveString(p.Nickname, 16).RemoveLines(), new Font(fontFamily, 11, FontStyle.Regular), Color.Orange, point));
                 }
                 catch { }
             }
@@ -124,7 +124,7 @@ namespace Dynastio.Bot
             image.Mutate(x => x.DrawText(profile.Details.Level.ToString(), new Font(fontFamily, 40, FontStyle.Bold), Color.WhiteSmoke, TextLevelPoint));
 
             var pointDetailsSection = new PointF() { X = 14, Y = 163 };
-            string TextDetails = string.Format("{0} was playing in {1}", profile.LastActiveAt.ToRelative(), profile.LatestServer.Summarizing(16));
+            string TextDetails = string.Format("{0} was playing in {1}", profile.LastActiveAt.ToRelative(), StringExtensions.RemoveString(profile.LatestServer, 16));
             image.Mutate(x => x.DrawText(TextDetails, new Font(fontFamily, 16, FontStyle.Bold), Color.WhiteSmoke, pointDetailsSection));
 
             var ExperienceLine = new Pen(Color.WhiteSmoke, 10);

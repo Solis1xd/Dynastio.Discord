@@ -26,14 +26,15 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
               [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
               [MaxValue(50)] int take = 25,
               SortType sort = SortType.Score,
-              Map Map = Map.Disable,
+              [Summary("Map", "Display The Mini Map")] Map Map = Map.Disable,
+              [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,
               int page = 1,
             DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
             var dynastioProvider = Dynastio[provider];
 
-            var players = dynastioProvider.OnlinePlayers.Where(a => a.Parent.IsPrivate == false).ToList() ?? null;
+            var players = dynastioProvider.OnlinePlayers.Where(a => filter == FilterType.PrivateServer ? a.Parent.IsPrivate : !a.Parent.IsPrivate).ToList() ?? null;
             if (players == null)
             {
                 await FollowupAsync(embed: "No any online server found.".ToWarnEmbed("Not Found !"));
@@ -51,16 +52,16 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             var players1 = players.Skip((page - 1) * take).Take(take).ToList();
             var content = players1.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
                 a => players.IndexOf(a),
-                a => a.Parent.Label.Summarizing(16),
+                a => a.Parent.Label.RemoveString(16),
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
-                a => a.Team.RemoveLines().Summarizing(10),
-                a => a.Nickname.RemoveLines().Summarizing(16)).ToMarkdown();
+                a => a.Team.RemoveLines().RemoveString(10),
+                a => a.Nickname.RemoveLines().RemoveString(16)).ToMarkdown();
 
             var map = Map == Map.Enable ? GraphicService.GetMap(players1) : null;
 
             var embeds = map != null ?
-                new Embed[] { content.ToEmbed(), "".ToEmbed(ImageUrl: "attachment://map.jpeg") } :
+                new Embed[] { content.ToEmbed(), "".ToEmbed(imageUrl: "attachment://map.jpeg") } :
                 new Embed[] { content.ToEmbed() };
 
             var msg = map != null ?
@@ -73,10 +74,6 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             Score,
             Level,
         }
-        public enum Map
-        {
-            Enable,
-            Disable
-        }
+
     }
 }

@@ -1,3 +1,13 @@
+0.4.9 - 30/07/2022
+- fix "/server" bug
+- server name length is increased in servers suggestions from 32 to 100 
+- better and improved server suggestions based on private and public servers
+- command "/players" changed to "/players search"
+- new command "/players find"
+- new command "/players discord"
+- new command "/players chest"
+- new command "/players profile"
+
 0.4.8 - 28/07/2022
 - new command (/server)
 - new command (/user chest)

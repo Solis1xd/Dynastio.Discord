@@ -20,7 +20,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             public DynastioClient Dynastio { get; set; }
 
-            [RateLimit(2)]
+            [RateLimit(5,2)]
             [SlashCommand("random", "get a random video")]
             [ComponentInteraction("videos.featured.random:*:*", true)]
             public async Task random(LocalType local = LocalType.common, DynastioProviderType provider = DynastioProviderType.Main)

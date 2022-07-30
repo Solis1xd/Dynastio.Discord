@@ -22,15 +22,21 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [SlashCommand("server", "get server information")]
         public async Task server(
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
+            [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,
             DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
             var dynastio = Dynastio[provider];
             var result = dynastio.OnlineServers.FirstOrDefault(a => a.Label.ToLower().Contains(server));
+            if (result == null)
+            {
+                await FollowupAsync(embed: $"Server `{server}` not found.".ToWarnEmbed("not found"));
+                return;
+            }
             var teams = result.Players.GroupBy(a => a.Team);
 
             var content =
-                $"**Label**: {result.Label.Summarizing(20)}\n" +
+                $"**Label**: {result.Label.RemoveString(20)}\n" +
                 $"**Region**: {result.Region}\n" +
                 $"**TopPlayerName** {result.TopPlayerName}\n" +
                 $"**TopPlayerLevel**: {result.TopPlayerLevel}\n" +
@@ -49,11 +55,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 $"**ServerTime**: {result.ServerTime}\n" +
                 $"**Version**: {result.Version}\n" +
                 $"**PlayersCount**: {result.PlayersCount}\n" +
-                $"**Players**: {string.Join(", ", result.Players.Select(a => a.Nickname.Summarizing(16))).ToMarkdown()}" +
+                $"**Players**: {string.Join(", ", result.Players.Select(a => a.Nickname.RemoveString(16))).ToMarkdown()}" +
                 $"**Teams**: {string.Join(", ", teams.Select(a => a.Key)).ToMarkdown()}" +
                 $"";
 
             await FollowupAsync(embed: content.ToEmbed("Server " + server));
         }
+
     }
 }

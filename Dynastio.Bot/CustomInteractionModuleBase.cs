@@ -102,7 +102,7 @@ namespace Dynastio.Bot
                 {
                     Title = Title ?? this["waiting_for_bot.title"],
                     Description = Description ?? this["waiting_for_bot.description"] + "\n" +
-                                       $"\n\n" + this["waiting_since:*", DateTime.UtcNow.ToDiscordUnixTimestampFormat()].Bold(),
+                                       $"\n\n" + this["waiting_since:*", DateTime.UtcNow.ToDiscordUnixTimestampFormat()].ToBold(),
                     ThumbnailUrl = ThumbnailUrl ?? "https://cdn.discordapp.com/attachments/916998929609023509/987005106203553812/Ellipsis-4.5s-183px_1.gif",
                     Color = Color.LightOrange
                 }.Build();
