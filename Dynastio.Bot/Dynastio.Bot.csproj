@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Dynastio.Bot.Data\Dynastio.Data.csproj" />
+	  <ProjectReference Include="..\Dynastio.Data\Dynastio.Data.csproj" />
 	</ItemGroup>
 
 
