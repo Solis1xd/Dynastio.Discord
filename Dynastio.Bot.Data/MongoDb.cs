@@ -2,7 +2,6 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,12 +10,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Dynastio.Bot
+namespace Dynastio.Data
 {
-    public class MongoService
+    public class MongoDb : IDynastioBotDatabase
     {
         private MongoClient _db { get; set; }
-        public MongoService(string mongoConnection)
+        public MongoDb(string mongoConnection)
         {
             Program.Log("Mongodb", "InitializeAsync");
 
@@ -26,11 +25,10 @@ namespace Dynastio.Bot
             Program.Log("Mongodb", "Initialized");
         }
         public bool IsConnected { get; set; }
-        public async Task<MongoService> InitializeAsync()
+        public async Task InitializeAsync()
         {
             try
             {
-         
                 Program.Log("Mongodb", "StartSessionAsync");
 
                 await _db.StartSessionAsync();
@@ -44,7 +42,6 @@ namespace Dynastio.Bot
                 IsConnected = false;
                 Console.WriteLine("Mongodb Not Connected");
             }
-            return this;
         }
 
         private IMongoDatabase _dynastio;

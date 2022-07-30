@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dynastio.Net;
-using Dynastio.Bot.Interactions.Modules.Dynastio;
 
-namespace Dynastio.Bot
+
+namespace Dynastio.Data
 {
 
     [BsonIgnoreExtraElements]

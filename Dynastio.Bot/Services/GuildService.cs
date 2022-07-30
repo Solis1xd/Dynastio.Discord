@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dynastio.Data;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,27 +11,27 @@ namespace Dynastio.Bot
     public class GuildService
     {
         private readonly ConcurrentBag<Guild> guilds;
-        private readonly MongoService mongo;
-        public GuildService(MongoService mongo)
+        private readonly IDynastioBotDatabase db;
+        public GuildService(IDynastioBotDatabase mongo)
         {
             Program.Log("GuildService", "StartAsync");
 
             guilds = new();
-            this.mongo = mongo;
+            this.db = mongo;
         }
         public async Task<Guild> GetGuildAsync(ulong id)
         {
             Guild guild = guilds.FirstOrDefault(a => a.Id == id);
             if (guild == null || guild == default)
             {
-                guild = await mongo.GetGuildAsync(id);
+                guild = await db.GetGuildAsync(id);
                 if (guild == null || guild == default)
                 {
-                    guild = new Guild(this)
+                    guild = new Guild(db)
                     {
                         Id = id,
                     };
-                    await mongo.InsertAsync(guild);
+                    await db.InsertAsync(guild);
                 }
                 guilds.Add(guild);
             }
@@ -38,7 +39,7 @@ namespace Dynastio.Bot
         }
         public async Task<bool> UpdateAsync(Guild guild)
         {
-            await mongo.UpdateAsync(guild);
+            await db.UpdateAsync(guild);
             return true;
         }
     }

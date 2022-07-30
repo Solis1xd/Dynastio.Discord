@@ -9,7 +9,7 @@ using Dynastio.Net;
 using Discord.WebSocket;
 using System.Net;
 using SixLabors.ImageSharp;
-
+using Dynastio.Data;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireBotPermission(ChannelPermission.AttachFiles)]

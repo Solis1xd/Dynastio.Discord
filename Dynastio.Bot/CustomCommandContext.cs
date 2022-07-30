@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Dynastio.Data;
 using Dynastio.Net;
 using System;
 using System.Collections.Generic;

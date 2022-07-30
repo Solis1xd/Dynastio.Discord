@@ -8,7 +8,7 @@ using Discord.WebSocket;
 using Discord;
 using Dynastio;
 using Dynastio.Bot;
-
+using Dynastio.Data;
 namespace Discord.Interactions
 {
     public class RequireBotUserPermissionAttribute : PreconditionAttribute

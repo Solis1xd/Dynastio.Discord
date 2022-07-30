@@ -5,7 +5,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-
+using Dynastio.Data;
 namespace Dynastio.Bot
 {
     public class EventHandler
@@ -15,14 +15,14 @@ namespace Dynastio.Bot
         private readonly Configuration _configuration;
         public readonly GuildService _guildService;
         private readonly LocaleService _localeService;
-        private readonly MongoService _mongoService;
+        private readonly IDynastioBotDatabase _db;
         public EventHandler(IServiceProvider services)
         {
             _client = services.GetRequiredService<DiscordSocketClient>();
             _configuration = services.GetRequiredService<Configuration>();
             _guildService = services.GetRequiredService<GuildService>();
             _localeService = services.GetRequiredService<LocaleService>();
-            _mongoService = services.GetRequiredService<MongoService>();
+            _db = services.GetRequiredService<IDynastioBotDatabase>();
             _services = services;
         }
         public void Initialize()
@@ -44,7 +44,7 @@ namespace Dynastio.Bot
             if (!Program.IsDebug())
             {
                 await LeaveExtraGuild().Try();
-                ChannelUtilities.CheckImageOnlyChannels(_mongoService, _client, _localeService).RunInBackground(true);
+                ChannelUtilities.CheckImageOnlyChannels(_db, _client, _localeService).RunInBackground(true);
             }
         }
 

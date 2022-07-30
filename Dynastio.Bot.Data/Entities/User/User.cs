@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dynastio.Net;
+
 using MongoDB.Bson;
 
-namespace Dynastio.Bot
+namespace Dynastio.Data
 {
     [BsonIgnoreExtraElements]
     public class User
     {
-        private readonly UserService _userManager;
+        private readonly IDynastioBotDatabase db;
         public User() { }
 
-        public User(UserService userManager)
+        public User(IDynastioBotDatabase db)
         {
-            _userManager = userManager;
+            this.db = db;
         }
         public ulong Id { get; set; }
 
@@ -61,8 +61,7 @@ namespace Dynastio.Bot
         }
         public async Task UpdateAsync()
         {
-            if (_userManager != null)
-                await _userManager.UpdateAsync(this);
+            await db.UpdateAsync(this);
         }
         public UserAccount GetAccount() => Accounts.OrderByDescending(a => a.IsDefault).FirstOrDefault();
         public UserAccount GetAccount(int hashcode) => Accounts.Where(a => a.GetHashCode() == hashcode).FirstOrDefault();
