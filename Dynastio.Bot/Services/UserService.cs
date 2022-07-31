@@ -6,26 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using Dynastio.Data;
 
 namespace Dynastio.Bot
 {
     public class UserService
     {
         private readonly ConcurrentBag<User> users;
-        private readonly MongoService mongo;
+        private readonly IDynastioBotDatabase db;
         private readonly DynastioClient dynastioClient;
-        public UserService(MongoService mongo, DynastioClient dynastioClient)
+        public UserService(IDynastioBotDatabase db, DynastioClient dynastioClient)
         {
             Program.Log("UserService", "StartAsync");
 
             users = new();
-            this.mongo = mongo;
+            this.db = db;
             this.dynastioClient = dynastioClient;
 
         }
         public async Task<bool> UpdateAsync(User user)
         {
-            await mongo.UpdateAsync(user);
+            await db.UpdateAsync(user);
             return true;
         }
         private bool _Is10TopHonorUpdated = false;
@@ -34,7 +35,7 @@ namespace Dynastio.Bot
             if (_Is10TopHonorUpdated)
                 return this.users.OrderByDescending(a => a.Honor).Take(10).ToList();
 
-            var users = await this.mongo.Get10TopHonor(10);
+            var users = await this.db.Get10TopHonor(10);
             foreach (var user in users)
             {
                 if (IsCached(user.Id) is false) Cache(user);
@@ -47,12 +48,12 @@ namespace Dynastio.Bot
             User user = users.FirstOrDefault(x => x.Id == Id);
             if (user is null)
             {
-                user = await mongo.GetUserAsync(Id);
+                user = await db.GetUserAsync(Id);
 
                 if (user is null && New is true)
                 {
                     user = await GetNewUserAsync(Id);
-                    await mongo.InsertAsync(user);
+                    await db.InsertAsync(user);
                 }
                 if (user != null)
                     Cache(user);
@@ -70,7 +71,7 @@ namespace Dynastio.Bot
         async Task<User> GetNewUserAsync(ulong id)
         {
             bool result = await dynastioClient.Main.IsUserAccountExistAsync("discord:" + id);
-            var user = new User(this)
+            var user = new User(this.db)
             {
                 Id = id,
                 Honor = 0,

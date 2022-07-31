@@ -29,6 +29,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player = "",
              DynastioProviderType provider = DynastioProviderType.Main)
         {
+            await DeferAsync();
             var player_ = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => a.UniqeId == player);
             if (player_ is null)
             {
@@ -56,6 +57,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player="",
              DynastioProviderType provider = DynastioProviderType.Main)
         {
+            await DeferAsync();
             var player_ = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => a.UniqeId == player);
             if (player_ is null)
             {

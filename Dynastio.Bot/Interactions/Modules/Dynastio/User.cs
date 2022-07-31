@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
-
+using Dynastio.Data;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 

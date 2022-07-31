@@ -1,5 +1,4 @@
-﻿using Discord;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,17 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynastio.Bot
+namespace Dynastio.Data
 {
     [BsonIgnoreExtraElements]
     public class Guild
     {
-        private readonly GuildService _guildService;
+        private readonly IDynastioBotDatabase db;
         public Guild() { }
 
-        public Guild(GuildService guildService)
+        public Guild(IDynastioBotDatabase db)
         {
-            _guildService = guildService;
+            this.db = db;
         }
         [BsonId]
         public ulong Id { get; set; }
@@ -25,8 +24,7 @@ namespace Dynastio.Bot
         public List<ulong> OnlyImageChannels { get; set; } = new();
         public async Task UpdateAsync()
         {
-            if (_guildService != null)
-                await _guildService.UpdateAsync(this);
+            await db.UpdateAsync(this);
         }
     }
 }

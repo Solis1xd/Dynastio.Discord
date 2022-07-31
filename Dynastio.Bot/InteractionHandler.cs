@@ -9,7 +9,7 @@ using Dynastio.Bot;
 using Dynastio.Bot.Extensions;
 using Newtonsoft.Json;
 using Dynastio.Net;
-
+using Dynastio.Data;
 namespace Dynastio.Bot
 {
     public class InteractionHandler
@@ -20,7 +20,7 @@ namespace Dynastio.Bot
         private readonly Configuration _configuration;
         private readonly UserService userService;
         private readonly LocaleService localeService;
-        private readonly MongoService mongoService;
+        private readonly IDynastioBotDatabase _db;
         private readonly GuildService _guildservice;
 
         public DynastioClient _dynastClient { get; set; }
@@ -33,7 +33,7 @@ namespace Dynastio.Bot
             _dynastClient = services.GetRequiredService<DynastioClient>();
             localeService = services.GetRequiredService<LocaleService>();
             _guildservice = services.GetRequiredService<GuildService>();
-            mongoService = services.GetRequiredService<MongoService>();
+            _db = services.GetRequiredService<IDynastioBotDatabase>();
             _services = services;
         }
 

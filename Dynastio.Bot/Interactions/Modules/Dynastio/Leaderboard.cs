@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Dynastio.Net;
-
+using Dynastio.Data;
 
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {

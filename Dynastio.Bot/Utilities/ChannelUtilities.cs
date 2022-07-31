@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Webhook;
 using Discord.WebSocket;
-
+using Dynastio.Data;
 namespace Dynastio.Bot
 {
     public class ChannelUtilities
@@ -63,9 +63,9 @@ namespace Dynastio.Bot
             }
             return false;
         }
-        public static async Task CheckImageOnlyChannels(MongoService _mongoService, DiscordSocketClient _client, LocaleService _localeService)
+        public static async Task CheckImageOnlyChannels(IDynastioBotDatabase _db, DiscordSocketClient _client, LocaleService _localeService)
         {
-            var guilds = await _mongoService.GetGuildsByMessageOnlyChannelsAsync();
+            var guilds = await _db.GetGuildsByMessageOnlyChannelsAsync();
             foreach (var g in guilds)
             {
                 bool updateGuild = false;

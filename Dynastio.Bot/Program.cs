@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Dynastio.Bot;
+using Dynastio.Data;
 using Dynastio.Net;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization;
@@ -38,30 +39,31 @@ namespace Dynastio.Bot
 
             var graphicService = new GraphicService().Initialize();
 
-            var mongoService = await new MongoService(configuration.MongoConnection).InitializeAsync();
+            IDynastioBotDatabase db = new MongoDb(configuration.MongoConnection);
+            await db.InitializeAsync();
 
             var dynastClient = new DynastioClient(configuration.DynastioApi);
 
-            var userService = new UserService(mongoService, dynastClient);
+            var userService = new UserService(db, dynastClient);
 
-            var guildService = new GuildService(mongoService);
+            var guildService = new GuildService(db);
 
             BsonClassMap.RegisterClassMap<User>(cm =>
             {
                 cm.AutoMap();
-                cm.MapCreator(x => new User(userService));
+                cm.MapCreator(x => new User(db));
             });
             BsonClassMap.RegisterClassMap<Guild>(cm =>
             {
                 cm.AutoMap();
-                cm.MapCreator(x => new Guild(guildService));
+                cm.MapCreator(x => new Guild(db));
             });
 
 
             var services = new ServiceCollection()
                 .AddSingleton(configuration)
                 .AddSingleton(dynastClient)
-                .AddSingleton(mongoService)
+                .AddSingleton((IDynastioBotDatabase)db)
                 .AddSingleton(userService)
                 .AddSingleton(guildService)
                 .AddSingleton(graphicService)
@@ -81,9 +83,9 @@ namespace Dynastio.Bot
         {
             GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages,
             AlwaysDownloadUsers = true,
-            AlwaysDownloadDefaultStickers=false,
-            DefaultRetryMode=RetryMode.AlwaysRetry,
-            
+            AlwaysDownloadDefaultStickers = false,
+            DefaultRetryMode = RetryMode.AlwaysRetry,
+
         };
         public async Task RunAsync(IServiceProvider _services)
         {
@@ -112,7 +114,6 @@ namespace Dynastio.Bot
         public static void Log(string service, string text)
         {
             Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);
-
         }
         public static bool IsDebug()
         {
