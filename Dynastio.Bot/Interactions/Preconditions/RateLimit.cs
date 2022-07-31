@@ -15,7 +15,7 @@ namespace Discord.Interactions
         private readonly RateLimitBaseType _baseType;
         private readonly int _requests;
         private readonly int _seconds;
-        public RateLimit(int seconds = 4, int requests = 1, RateLimitType context = RateLimitType.User, RateLimitBaseType baseType = RateLimitBaseType.BaseOnCommandInfoHashCode)
+        public RateLimit(int seconds = 4, int requests = 1, RateLimitType context = RateLimitType.User, RateLimitBaseType baseType = RateLimitBaseType.BaseOnCommandInfo)
         {
             this._context = context;
             this._requests = requests;
@@ -32,11 +32,12 @@ namespace Discord.Interactions
                 RateLimitType.Global => 0,
                 _ => 0
             };
-
+            
             var contextId = _baseType switch
             {
-                RateLimitBaseType.BaseOnCommandInfoHashCode => commandInfo.GetHashCode().ToString(),
                 RateLimitBaseType.BaseOnCommandInfo => commandInfo.Module.Name + "//" + commandInfo.Name + "//" + commandInfo.MethodName,
+                RateLimitBaseType.BaseOnCommandInfoHashCode => commandInfo.GetHashCode().ToString(),
+                RateLimitBaseType.BaseOnSlashCommandName=> (context.Interaction as SocketSlashCommand).CommandName,
                 RateLimitBaseType.BaseOnMessageComponentCustomId => (context.Interaction as SocketMessageComponent).Data.CustomId,
                 RateLimitBaseType.BaseOnAutocompleteCommandName => (context.Interaction as SocketAutocompleteInteraction).Data.CommandName,
                 RateLimitBaseType.BaseOnApplicationCommandName => (context.Interaction as SocketApplicationCommand).Name,
@@ -84,6 +85,7 @@ namespace Discord.Interactions
         {
             BaseOnCommandInfo,
             BaseOnCommandInfoHashCode,
+            BaseOnSlashCommandName,
             BaseOnMessageComponentCustomId,
             BaseOnAutocompleteCommandName,
             BaseOnApplicationCommandName,
