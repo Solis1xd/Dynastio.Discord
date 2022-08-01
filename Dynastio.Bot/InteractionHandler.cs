@@ -62,7 +62,7 @@ namespace Dynastio.Bot
             // Context & Slash commands can be automatically registered, but this process needs to happen after the client enters the READY state.
             // Since Global Commands take around 1 hour to register, we should use a test guild to instantly update and test our commands.
             if (Program.IsDebug())
-                await _handler.RegisterCommandsToGuildAsync(_configuration.Guilds.Test, true);
+                await _handler.RegisterCommandsToGuildAsync(_configuration.Guilds.DebugServer, true);
             else
                 await _handler.RegisterCommandsGloballyAsync(true);
 
@@ -147,7 +147,7 @@ namespace Dynastio.Bot
                                           $"\nName: {commandInfo.Name}" +
                                           $"\nMethodName: {commandInfo.MethodName}" +
                                           $"\nUser: {context_.User.Id}";
-                            var channel = _client.GetGuild(_configuration.Guilds.Main).GetTextChannel(_configuration.Channels.ErrorLogger);
+                            var channel = _client.GetGuild(_configuration.Guilds.MainServer).GetTextChannel(_configuration.Channels.ErrorLoggerChannel);
                             await DiscordStream.SendStringAsFile(channel, content);
                         }
                     }

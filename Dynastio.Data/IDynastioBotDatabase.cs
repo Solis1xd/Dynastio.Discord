@@ -8,11 +8,15 @@ namespace Dynastio.Data
 {
     public interface IDynastioBotDatabase
     {
-        Task InitializeAsync();
+        Task<IDynastioBotDatabase> InitializeAsync();
+
+        //Guilds
         Task<List<Guild>> GetGuildsByMessageOnlyChannelsAsync();
         Task<Guild> GetGuildAsync(ulong Id);
         Task<bool> InsertAsync(Guild guild);
         Task<bool> UpdateAsync(Guild guild);
+
+        //Users
         Task<List<User>> Get10TopHonor(int count = 10);
         List<User> GetAll();
         Task<User> GetUserAsync(ulong Id);

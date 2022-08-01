@@ -12,11 +12,8 @@ namespace Dynastio.Bot
     public class Configuration
     {
         public string BotToken { get; set; }
-        public string Status { get; set; }
-        public string YoutubeApi { get; set; }
         public string DynastioApi { get; set; }
-        public string MongoConnection { get; set; }
-        public string YoutubeLink { get; set; }
+        public string DatabaseConnectionString { get; set; }
         public GuildsConfiguration Guilds { get; set; }
         public ChannelsConfiguration Channels { get; set; }
 
@@ -47,17 +44,14 @@ namespace Dynastio.Bot
     }
     public class GuildsConfiguration
     {
-        public ulong Main { get; set; }
-        public ulong Test { get; set; }
-        public string InviteLinkMain { get; set; }
-
+        public ulong MainServer { get; set; }
+        public ulong DebugServer { get; set; }
     }
     public class ChannelsConfiguration
     {
-
-        public ulong Logger { get; set; }
-        public ulong ErrorLogger { get; set; }
-        public ulong Uploads { get; set; }
-        public ulong Honor { get; set; }
+        public ulong JoinLeftLoggerChannel { get; set; }
+        public ulong ErrorLoggerChannel { get; set; }
+        public ulong HonorChannel { get; set; }
+        public ulong UploadsChannel { get; set; }
     }
 }

@@ -21,6 +21,9 @@ namespace Dynastio.Bot
         public const int ImageOnlyChannelsSlowMode = 30;
         public static Random Random = new Random();
         public static DateTime StartUp { get; } = DateTime.UtcNow;
+        public const string MainGuildInviteLink = "https://discord.gg/GVUXMNv7vV";
+        public const string YoutubeChannelLink = "https://www.youtube.com/channel/UCW0PmC1B8jjhpKLHciFp0xA/?sub_confirmation=1";
+        public const string BotStatus = "In Development";
         public static void Main(string[] arg) => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()
         {
@@ -39,8 +42,15 @@ namespace Dynastio.Bot
 
             var graphicService = new GraphicService().Initialize();
 
-            IDynastioBotDatabase db = new MongoDb(configuration.MongoConnection);
-            await db.InitializeAsync();
+            IDynastioBotDatabase db =
+                configuration.DatabaseConnectionString.IsNullOrEmpty()
+                ? new NoDatabaseDb()
+                : configuration.DatabaseConnectionString.Contains("mongodb")
+
+                ? new MongoDb(configuration.DatabaseConnectionString)
+                : new NoDatabaseDb();
+
+            db = await db.InitializeAsync();
 
             var dynastClient = new DynastioClient(configuration.DynastioApi);
 

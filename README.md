@@ -103,21 +103,18 @@ I have tried to implement all the available Apis in the bot, The bot uses a free
   
  ```json
 {
-  "BotToken": "Bot_Token",
-  "DynastioApi":"Dynast.io_Token",
-  "MongoConnection": "Mongo_Connection",
-  "Status": "In Development",
-  "YoutubeLink": "https://www.youtube.com/channel/UCW0PmC1B8jjhpKLHciFp0xA/?sub_confirmation=1",
+  "BotToken": "Discord_Bot_Token",
+  "DynastioApi":"Dynastio_Api_Token",
+  "DatabaseConnectionString": "Your_DB_Connection_String",
   "Guilds": {
-    "Main": 0, // Your Discord Server Id
-    "Test": 0, // Your Test Discord Server Id
-    "InviteLinkMain": "https://discord.gg/GVUXMNv7vV" // Your Discord Server Invite Link
+    "MainServer": 875716592770637824,
+    "DebugServer": 941235983284830208,
   },
   "Channels": {
-    "Logger": 0, // Log when bot Joins & Lefts
-	"Honor"0, // Honor Channel Id
-	"Uploads":0, // a private channel for upload images & files (spam)
-	"ErrorLogger":0 // a channel for Log the bot errors 
+    "JoinLeftLoggerChannel": 918560623573495918,
+	"ErrorLoggerChannel":948672329813209118,
+	"HonorChannel":939878098873233438,
+	"UploadsChannel":988054411014180874
   }
 }
 ```
@@ -129,7 +126,7 @@ This is an example of how to list things you need to use the software and how to
 
 - You need a discord server [See Here](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server-)
 - You need a discord bot [See Here](https://discordjs.guide/preparations/setting-up-a-bot-application.html#token-leak-scenario)
-- You need a Mongodb account [See Here](https://www.mongodb.com/) 
+- You need a Mongodb account (Optional) [See Here](https://www.mongodb.com/) 
 - You need Dynast.io api [See Here](https://github.com/jalaljaleh/Dynastio.Net)
 
 

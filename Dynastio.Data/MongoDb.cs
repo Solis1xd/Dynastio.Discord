@@ -24,23 +24,20 @@ namespace Dynastio.Data
 
             Program.Log("Mongodb", "Initialized");
         }
-        public bool IsConnected { get; set; }
-        public async Task InitializeAsync()
+        public async Task<IDynastioBotDatabase> InitializeAsync()
         {
             try
             {
                 Program.Log("Mongodb", "StartSessionAsync");
 
                 await _db.StartSessionAsync();
-
                 Program.Log("Mongodb", "Session Started");
-
-                IsConnected = true;
+                return this;
             }
             catch
             {
-                IsConnected = false;
                 Console.WriteLine("Mongodb Not Connected");
+                return new NoDatabaseDb();
             }
         }
 
@@ -49,74 +46,50 @@ namespace Dynastio.Data
         private IMongoCollection<Guild> _guilds => _dynastio.GetCollection<Guild>("Guilds");
         public async Task<List<Guild>> GetGuildsByMessageOnlyChannelsAsync()
         {
-            if (IsConnected)
-            {
-                var result = _guilds.Find(a => a.OnlyImageChannels.Count > 0).ToList();
-                return await Task.FromResult(result);
-            }
-            return new();
+            var result = _guilds.Find(a => a.OnlyImageChannels.Count > 0).ToList();
+            return await Task.FromResult(result);
         }
         public async Task<Guild> GetGuildAsync(ulong Id)
         {
-            if (IsConnected)
-            {
-                var result = _guilds.Find(a => a.Id == Id).FirstOrDefault();
-                return await Task.FromResult(result);
-            }
-            return await Task.FromResult(new Guild()
-            {
-                Id = Id
-            });
+            var result = _guilds.Find(a => a.Id == Id).FirstOrDefault();
+            return await Task.FromResult(result);
         }
         public async Task<bool> InsertAsync(Guild guild)
         {
-            if (IsConnected)
-                _guilds.InsertOne(guild);
-
+            _guilds.InsertOne(guild);
             return await Task.FromResult(true);
         }
         public async Task<bool> UpdateAsync(Guild guild)
         {
-            if (IsConnected)
-                _guilds.ReplaceOne(a => a.Id == guild.Id, guild);
+            _guilds.ReplaceOne(a => a.Id == guild.Id, guild);
             return await Task.FromResult(true);
         }
 
         public async Task<List<User>> Get10TopHonor(int count = 10)
         {
-            if (IsConnected)
+            var filter = Builders<User>.Filter.Empty;
+            var sort = Builders<User>.Sort.Descending(a => a.Honor);
+            var result = await _users.FindAsync(filter, new FindOptions<User, User>()
             {
-                var filter = Builders<User>.Filter.Empty;
-                var sort = Builders<User>.Sort.Descending(a => a.Honor);
-                var result = await _users.FindAsync(filter, new FindOptions<User, User>()
-                {
-                    Sort = sort,
-                    Limit = count,
-                });
-                return result.ToList();
-            }
-            return new();
+                Sort = sort,
+                Limit = count,
+            });
+            return result.ToList();
         }
-        public List<User> GetAll() => IsConnected ? _users.Find<User>(_ => true).ToList() : new();
+        public List<User> GetAll() => _users.Find<User>(_ => true).ToList();
         public async Task<User> GetUserAsync(ulong Id)
         {
-            if (IsConnected)
-            {
-                var result = _users.Find(a => a.Id == Id).FirstOrDefault();
-                return await Task.FromResult(result);
-            }
-            return new User() { Id = Id };
+            var result = _users.Find(a => a.Id == Id).FirstOrDefault();
+            return await Task.FromResult(result);
         }
         public async Task<bool> InsertAsync(User Buser)
         {
-            if (IsConnected)
-                _users.InsertOne(Buser);
+            _users.InsertOne(Buser);
             return await Task.FromResult(true);
         }
         public async Task<bool> UpdateAsync(User Buser)
         {
-            if (IsConnected)
-                _users.ReplaceOne(a => a.Id == Buser.Id, Buser);
+            _users.ReplaceOne(a => a.Id == Buser.Id, Buser);
             return await Task.FromResult(true);
         }
         //public async Task<User> GetUserByAccountIdAsync(string Id)
@@ -143,22 +116,18 @@ namespace Dynastio.Data
 
         public async Task<bool> UpdateManyAsync(List<User> users)
         {
-            if (IsConnected)
+            var updates = new List<WriteModel<User>>();
+            foreach (var user in users)
             {
-                var updates = new List<WriteModel<User>>();
-                foreach (var user in users)
-                {
-                    var filter = Builders<User>.Filter.Where(u => u.Id == user.Id);
-                    updates.Add(new ReplaceOneModel<User>(filter, user));
-                }
-                await _users.BulkWriteAsync(updates, new BulkWriteOptions() { IsOrdered = false });
+                var filter = Builders<User>.Filter.Where(u => u.Id == user.Id);
+                updates.Add(new ReplaceOneModel<User>(filter, user));
             }
+            await _users.BulkWriteAsync(updates, new BulkWriteOptions() { IsOrdered = false });
             return await Task.FromResult(true);
         }
         public async Task<bool> DeleteAsync(User user)
         {
-            if (IsConnected)
-                _users.DeleteOne(a => a.Id == user.Id);
+            _users.DeleteOne(a => a.Id == user.Id);
             return await Task.FromResult(true);
         }
     }

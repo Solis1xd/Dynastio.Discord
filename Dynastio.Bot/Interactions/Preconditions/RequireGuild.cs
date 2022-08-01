@@ -38,7 +38,7 @@ namespace Discord.Interactions
         {
             if (Program.IsDebug()) return Task.FromResult(PreconditionResult.FromSuccess());
 
-            if (LocalGuild.HasValue ? context.Guild.Id == services.GetRequiredService<Configuration>().Guilds.Main : context.Guild.Id == GuildId)
+            if (LocalGuild.HasValue ? context.Guild.Id == services.GetRequiredService<Configuration>().Guilds.MainServer : context.Guild.Id == GuildId)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
             {
