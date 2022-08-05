@@ -12,7 +12,7 @@ using System.Timers;
 
 namespace Dynastio.Data
 {
-    public class MongoDb : IDynastioBotDatabase
+    public class MongoDb : IDynastioBotDatabase, IDisposable
     {
         private MongoClient _db { get; set; }
         public MongoDb(string mongoConnection)
@@ -31,12 +31,14 @@ namespace Dynastio.Data
                 Program.Log("Mongodb", "StartSessionAsync");
 
                 await _db.StartSessionAsync();
+              
                 Program.Log("Mongodb", "Session Started");
                 return this;
             }
             catch
             {
                 Console.WriteLine("Mongodb Not Connected");
+                this.Dispose();
                 return new NoDatabaseDb();
             }
         }
@@ -92,12 +94,12 @@ namespace Dynastio.Data
             _users.ReplaceOne(a => a.Id == Buser.Id, Buser);
             return await Task.FromResult(true);
         }
-        //public async Task<User> GetUserByAccountIdAsync(string Id)
-        //{
-        //    var filter = Builders<User>.Filter.ElemMatch(o => o.GameAccounts, Builders<DynastioAccount>.Filter.Where(a => a.Id == Id));
-        //    var result = _users.Find(filter).FirstOrDefault();
-        //    return await Task.FromResult(result);
-        //}
+        public async Task<User> GetUserByAccountIdAsync(string Id)
+        {
+            var filter = Builders<User>.Filter.ElemMatch(o => o.Accounts, Builders<UserAccount>.Filter.Where(a => a.Id == Id));
+            var result = _users.Find(filter).FirstOrDefault();
+            return await Task.FromResult(result);
+        }
         //public async Task<List<User>> GetUsersByAccountIdAsync(List<string> toFind)
         //{
         //    var regexList = toFind.Select(x => new BsonRegularExpression(x));
@@ -129,6 +131,11 @@ namespace Dynastio.Data
         {
             _users.DeleteOne(a => a.Id == user.Id);
             return await Task.FromResult(true);
+        }
+
+        public void Dispose()
+        {
+            this._db = null;
         }
     }
 }

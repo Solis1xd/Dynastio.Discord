@@ -14,7 +14,8 @@ namespace Dynastio.Data
     {
         public UserAccount() { }
         public UserAccount(string Id) { this.Id = Id; }
-
+        
+        [BsonId]
         public string Id { get; set; }
         public string Nickname { get; set; }
         public DateTime AddedAt { get; set; }

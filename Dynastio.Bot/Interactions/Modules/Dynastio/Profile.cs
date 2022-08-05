@@ -41,6 +41,120 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             var image = GraphicService.GetProfile(profile);
             var msg = await FollowupWithFileAsync(image, "profile.jpeg");
         }
+        [RateLimit(200, 3)]
+        [RequireUserDynastioAccount]
+        [SlashCommand("leaderboard", "your place in leaderboard")]
+        public async Task leaderboard_me(
+            LeaderboardType leaderboard = LeaderboardType.Monthly,
+            [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+            DynastioProviderType provider = DynastioProviderType.Main)
+        {
+            await DeferAsync();
+
+            var dynastioProvider = Dynastio[provider];
+
+            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
+               ? Context.BotUser.GetAccount()
+               : Context.BotUser.GetAccount(int.Parse(account));
+
+            var result = await dynastioProvider.GetUserSurroundingRankAsync(selectedAccount.Id);
+            if (result is null)
+            {
+                await FollowupAsync(embed: "data not found".ToWarnEmbed("Not found"));
+                return;
+            }
+            UserSurroundingRankRow userSurroundingRank = leaderboard switch
+            {
+                LeaderboardType.Monthly => result.Montly,
+                LeaderboardType.Weekly => result.Weekly,
+                LeaderboardType.Daily => result.Daily,
+                _ => null
+            };
+            List<UserSurroundingRankRow> usersSurroundingRank = leaderboard switch
+            {
+                LeaderboardType.Monthly => result.UsersRankMontly,
+                LeaderboardType.Weekly => result.UsersRankWeekly,
+                LeaderboardType.Daily => result.UsersRankDaily,
+                _ => null
+            };
+
+            var user = usersSurroundingRank.FirstOrDefault();
+            if (user is null)
+            {
+                await FollowupAsync(embed: "data not found".ToWarnEmbed("Not found"));
+                return;
+            }
+
+            var firstUser = await dynastioProvider.GetUserRanAsync(user.Id);
+            int index = leaderboard switch
+            {
+                LeaderboardType.Monthly => firstUser.Monthly,
+                LeaderboardType.Weekly => firstUser.Weekly,
+                LeaderboardType.Daily => firstUser.Daily,
+                _ => 0
+            };
+
+            string content = $"**Your rank is: {index + 5}**" +
+                              usersSurroundingRank.ToStringTable(new[] { this["index"], this["score"], this["time"], this["nickname"] },
+                a => $"{(usersSurroundingRank.IndexOf(a) + index).ToRegularCounter()}",
+                a => $"{a.Score.Metric()}",
+                a => a.CreatedAt.ToRelative(),
+                a => $"{a.Nickname.RemoveLines()}").ToMarkdown();
+
+            await FollowupAsync(Context.User.Id.ToUserMention(), embed: content.ToEmbed(this["leaderboard"] + " Me " + this[leaderboard.ToString().ToLower()]));
+        }
+        [RequireUserDynastioAccount]
+        [SlashCommand("stat", "stat")]
+        [RateLimit(60, 2, RateLimit.RateLimitType.User)]
+        public async Task stat(
+           StatType stat, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+           DynastioProviderType provider = DynastioProviderType.Main)
+        {
+            await DeferAsync();
+
+            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
+            string type = stat == StatType.Craft || stat == StatType.Gather || stat == StatType.Shop ? "item" : "entity";
+            string property = stat.ToString().ToLower();
+
+
+            var dynastioProvider = Dynastio[provider];
+            var stat_ = await dynastioProvider.GetUserStatAsync(account_.Id).TryGet();
+            if (stat_ is null)
+            {
+                await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
+                return;
+            }
+            var image = type switch
+            {
+                "item" => GraphicService.GetStat(property switch
+                {
+                    "craft" => stat_.Craft,
+                    "gather" => stat_.Gather,
+                    "shop" => stat_.Shop,
+                    _ => null
+                }),
+                "entity" => GraphicService.GetStat(property switch
+                {
+                    "build" => stat_.Build,
+                    "kill" => stat_.Kill,
+                    "death" => stat_.Death,
+                    _ => null
+                }),
+                _ => null
+            };
+
+            await FollowupWithFileAsync(image, "stat.jpeg", Context.User.Id.ToUserMention());
+        }
+
+        public enum StatType
+        {
+            Craft,
+            Gather,
+            Shop,
+            Build,
+            Kill,
+            Death,
+        }
 
         [RateLimit(150, 2)]
         [SlashCommand("details", "your dynastio profile details")]

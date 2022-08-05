@@ -56,6 +56,10 @@ namespace Dynastio.Data
                 Id = Id
             });
         }
+        public async Task<User> GetUserByAccountIdAsync(string Id)
+        {
+            return await Task.FromResult(default(User));
+        }
         public Task<bool> InsertAsync(User Buser)
         {
             return Task.FromResult(true);

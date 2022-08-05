@@ -55,7 +55,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             }
         }
         [RequireUser]
-        [RateLimit(60, 4, RateLimit.RateLimitType.User)]
+        [RateLimit(30, 4, RateLimit.RateLimitType.User)]
         [ComponentInteraction("changelog.buttons:*:*")]
         public async Task ToplistButtons(string search, int page)
         {

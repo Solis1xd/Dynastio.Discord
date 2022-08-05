@@ -20,11 +20,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public GraphicService GraphicService { get; set; }
         public DynastioClient Dynastio { get; set; }
 
-        [RateLimit(10, 1, RateLimit.RateLimitType.User)]
+        [RateLimit(8, 1, RateLimit.RateLimitType.User)]
         [SlashCommand("toplist", "a list of top players")]
         public async Task toplist(
               [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
-              [MaxValue(50)] int take = 25,
+              [MaxValue(60)] int take = 25,
               SortType sort = SortType.Score,
               [Summary("Map", "Display The Mini Map")] Map Map = Map.Disable,
               [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,

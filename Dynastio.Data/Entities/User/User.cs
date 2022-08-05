@@ -20,19 +20,9 @@ namespace Dynastio.Data
             this.db = db;
         }
         public ulong Id { get; set; }
-
-        [BsonElement("GameAccounts")]
         public List<UserAccount> Accounts { get; set; } = new();
-        public UserSettings Settings { get; set; } = new();
-        public UserPermissions Permissions { get; set; } = new();
-        public UserFriends Friends { get; set; } = new();
-        public string BanReason { get; set; } = "";
-        public bool Banned { get; set; } = false;
-        public DateTime BannedAt { get; set; } = DateTime.MinValue;
-        public TimeSpan BannedTime { get; set; } = TimeSpan.Zero;
         public DateTime LastHonorGift { get; set; } = DateTime.MinValue;
         public int Honor { get; set; } = 0;
-        public bool BannedFeedback { get; set; } = false;
 
         public void AddAccount(UserAccount account)
         {

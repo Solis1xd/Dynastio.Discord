@@ -41,17 +41,6 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
                 }
                 await FollowupAsync(embed: "Can not set more than 6 hours".ToWarnEmbed("Discord Error"));
             }
-            public enum TimeType
-            {
-                None = 0,
-                Secound = 1,
-                Minute = 60,
-                Hour = 3600,
-                Day = 86400,
-                Week = 604800,
-                Month = 2419200,
-                Year = 29030400
-            }
         }
 
         [Group("image-only", "image only channels")]

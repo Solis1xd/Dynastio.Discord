@@ -18,68 +18,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public UserService UserService { get; set; }
         public DynastioClient Dynastio { get; set; }
 
-        [RateLimit(200, 3)]
-        [RequireUserDynastioAccount]
-        [SlashCommand("me", "leaderboard me")]
-        public async Task leaderboard_me(
-            LeaderboardType leaderboard = LeaderboardType.Monthly,
-            [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
-            DynastioProviderType provider = DynastioProviderType.Main)
-        {
-            await DeferAsync();
-
-            var dynastioProvider = Dynastio[provider];
-
-            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
-               ? Context.BotUser.GetAccount()
-               : Context.BotUser.GetAccount(int.Parse(account));
-
-            var result = await dynastioProvider.GetUserSurroundingRankAsync(selectedAccount.Id);
-            if (result is null)
-            {
-                await FollowupAsync(embed: "data not found".ToWarnEmbed("Not found"));
-                return;
-            }
-            UserSurroundingRankRow userSurroundingRank = leaderboard switch
-            {
-                LeaderboardType.Monthly => result.Montly,
-                LeaderboardType.Weekly => result.Weekly,
-                LeaderboardType.Daily => result.Daily,
-                _ => null
-            };
-            List<UserSurroundingRankRow> usersSurroundingRank = leaderboard switch
-            {
-                LeaderboardType.Monthly => result.UsersRankMontly,
-                LeaderboardType.Weekly => result.UsersRankWeekly,
-                LeaderboardType.Daily => result.UsersRankDaily,
-                _ => null
-            };
-
-            var user = usersSurroundingRank.FirstOrDefault();
-            if (user is null)
-            {
-                await FollowupAsync(embed: "data not found".ToWarnEmbed("Not found"));
-                return;
-            }
-
-            var firstUser = await dynastioProvider.GetUserRanAsync(user.Id);
-            int index = leaderboard switch
-            {
-                LeaderboardType.Monthly => firstUser.Monthly,
-                LeaderboardType.Weekly => firstUser.Weekly,
-                LeaderboardType.Daily => firstUser.Daily,
-                _ => 0
-            };
-
-            string content = $"**Your rank is: {index + 5}**" +
-                              usersSurroundingRank.ToStringTable(new[] { this["index"], this["score"], this["time"], this["nickname"] },
-                a => $"{(usersSurroundingRank.IndexOf(a) + index).ToRegularCounter()}",
-                a => $"{a.Score.Metric()}",
-                a => a.CreatedAt.ToRelative(),
-                a => $"{a.Nickname.RemoveLines()}").ToMarkdown();
-
-            await FollowupAsync(Context.User.Id.ToUserMention(), embed: content.ToEmbed(this["leaderboard"] + " Me " + this[leaderboard.ToString().ToLower()]));
-        }
+       
         [RateLimit(3)]
         [SlashCommand("score", "leaderboard score")]
         public async Task LeaderboardScore(LeaderboardType leaderboard = LeaderboardType.Monthly,

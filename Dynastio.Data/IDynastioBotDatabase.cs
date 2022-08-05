@@ -20,6 +20,7 @@ namespace Dynastio.Data
         Task<List<User>> Get10TopHonor(int count = 10);
         List<User> GetAll();
         Task<User> GetUserAsync(ulong Id);
+        Task<User> GetUserByAccountIdAsync(string Id);
         Task<bool> InsertAsync(User Buser);
         Task<bool> UpdateAsync(User Buser);
         Task<bool> UpdateManyAsync(List<User> users);

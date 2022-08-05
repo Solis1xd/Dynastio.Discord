@@ -60,6 +60,17 @@ namespace Dynastio.Bot
             }
             return user;
         }
+        public async Task<User> GetUserByGameAccountIdAsync(string accountId)
+        {
+            User user = users.FirstOrDefault(x => x.GetAccount(accountId) != null);
+            if (user is null)
+            {
+                user = await db.GetUserByAccountIdAsync(accountId);
+                if (user != null)
+                    Cache(user);
+            }
+            return user;
+        }
         public void Cache(User user)
         {
             users.Add(user);

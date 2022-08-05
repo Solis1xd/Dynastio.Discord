@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynastio.Data;
+
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireContext(ContextType.Guild)]
@@ -46,7 +47,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
 
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
+            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
             Context.BotUser.SwitchDefault(account_);
             await Context.BotUser.UpdateAsync();
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
@@ -82,6 +83,23 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             await Context.BotUser.UpdateAsync();
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_removed"].ToSuccessfulEmbed("account_removed"));
+        }
+        [RequireUserDynastioAccount]
+        [RateLimit(4, 2)]
+        [SlashCommand("get", "get a connected account details")]
+        public async Task id([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
+        {
+            await DeferAsync(true);
+
+            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
+
+            await FollowupAsync(Context.User.Id.ToUserMention(),
+                embed:
+                ($"Nickname: {account_.Nickname}" +
+                $"Account Id: `{account_.Id}`" +
+                $"Added at: {account_.AddedAt.ToDiscordUnixTimestampFormat()}" +
+                $"Is Default: {account_.IsDefault}")
+                .ToSuccessfulEmbed(), ephemeral: true);
         }
         [RateLimit(10)]
         [SlashCommand("add", "connect new account to the bot")]
@@ -139,6 +157,14 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 await FollowupAsync(Context.UserMention(), embed: this["wrong_coin"].ToDangerEmbed(this["unauthorized"]));
                 return;
             }
+
+            var targetUser = await userManager.GetUserByGameAccountIdAsync(id);
+            if (targetUser != null)
+            {
+                await FollowupAsync(Context.UserMention(), embed: $"This account added by {targetUser.Id.ToUserMention()} already.".ToDangerEmbed(this["unauthorized"]));
+                return;
+            }
+
             var account = new UserAccount()
             {
                 Id = id,

@@ -24,6 +24,8 @@ namespace Dynastio.Bot
         public const string MainGuildInviteLink = "https://discord.gg/GVUXMNv7vV";
         public const string YoutubeChannelLink = "https://www.youtube.com/channel/UCW0PmC1B8jjhpKLHciFp0xA/?sub_confirmation=1";
         public const string BotStatus = "In Development";
+        public const string FilePathConfigurationMain = @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.json";
+        public const string FilePathConfigurationDebug = @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.debug.json";
         public static void Main(string[] arg) => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()
         {
@@ -35,7 +37,7 @@ namespace Dynastio.Bot
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
             };
 
-            var configuration = Configuration.Get(false ? @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.json" : @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.debug.json");
+            var configuration = Configuration.Get(false ? FilePathConfigurationMain : FilePathConfigurationDebug);
 
             //LocaleService.StartTranslateProccess();
             var languages = new LocaleService();
@@ -50,13 +52,13 @@ namespace Dynastio.Bot
                 ? new MongoDb(configuration.DatabaseConnectionString)
                 : new NoDatabaseDb();
 
-            db = await db.InitializeAsync();
-
             var dynastClient = new DynastioClient(configuration.DynastioApi);
+            db = await db.InitializeAsync();
 
             var userService = new UserService(db, dynastClient);
 
             var guildService = new GuildService(db);
+
 
             BsonClassMap.RegisterClassMap<User>(cm =>
             {
@@ -68,7 +70,6 @@ namespace Dynastio.Bot
                 cm.AutoMap();
                 cm.MapCreator(x => new Guild(db));
             });
-
 
             var services = new ServiceCollection()
                 .AddSingleton(configuration)

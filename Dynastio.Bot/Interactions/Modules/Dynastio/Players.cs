@@ -22,7 +22,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public DynastioClient Dynastio { get; set; }
         public UserService UserService { get; set; }
 
-        [RateLimit(120,4)]
+        [RateLimit(120, 4)]
         [SlashCommand("profile", "online player profile")]
         public async Task profile(
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
@@ -54,7 +54,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [SlashCommand("chest", "online player chest")]
         public async Task chest(
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
-            [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player="",
+            [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player = "",
              DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
@@ -100,13 +100,13 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 return;
             }
 
-            var team = Dynastio[provider].OnlinePlayers.GroupBy(a => a.Team).FirstOrDefault(a => a.Key == result.Team);
+            var team = Dynastio[provider].OnlinePlayers.GroupBy(a => a.Team).FirstOrDefault(a => a.Key == result.Team && !string.IsNullOrEmpty(a.Key));
             var teammates = team is null ? "`none`" : string.Join(", ", team.Select(a => a.Nickname));
             string content =
-                $"**Nickname:** {result.Nickname}\n" +
+                $"**Nickname:** {result.Nickname.RemoveString(18)}\n" +
                 $"**Level:** {result.Level}\n" +
                 $"**Score:** {result.Score.Metric()}\n" +
-                $"**Server:** {result.Parent.Label}\n" +
+                $"**Server:** {result.Parent.Label.RemoveString(20)}\n" +
                 $"**Team:** {result.Team}\n" +
                 $"**Teammates:**: {teammates.ToMarkdown()}";
 
@@ -164,7 +164,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,
             SortType sort = SortType.Score,
             Map Map = Map.Disable,
-            [MaxValue(25)] int take = 25,
+            [MaxValue(50)] int take = 25,
             string nickname = "",
             int MinLevel = 0,
             int MaxLevel = int.MaxValue,

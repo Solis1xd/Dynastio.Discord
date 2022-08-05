@@ -66,11 +66,11 @@ namespace Dynastio.Bot
             else
                 await _handler.RegisterCommandsGloballyAsync(true);
 
-           
-                //var cmds = await _client.GetGlobalApplicationCommandsAsync();
-                //foreach (var cmd in cmds)
-                //    await cmd.DeleteAsync();
-            
+
+            //var cmds = await _client.GetGlobalApplicationCommandsAsync();
+            //foreach (var cmd in cmds)
+            //    await cmd.DeleteAsync();
+
         }
 
         private async Task HandleInteraction(SocketInteraction interaction)
@@ -86,6 +86,22 @@ namespace Dynastio.Bot
 
             // Execute the incoming command.
             var result = await _handler.ExecuteCommandAsync(context, _services);
+        }
+        public async Task LogErrorAsync(ICommandInfo commandInfo, IInteractionContext context_, IResult result)
+        {
+            //if (Program.IsDebug())
+            //    return;
+
+            if (result.ErrorReason == "Input string was not in a correct format.")
+                return;
+
+            var content = JsonConvert.SerializeObject(result) +
+                          $"\nName: {commandInfo.Name}" +
+                          $"\nMethodName: {commandInfo.MethodName}" +
+                          $"\nUser: {context_.User.Id}";
+            var channel = _client.GetGuild(_configuration.Guilds.MainServer)
+                .GetTextChannel(_configuration.Channels.ErrorLoggerChannel);
+            await DiscordStream.SendStringAsFile(channel, content);
         }
         private async Task _handler_InteractionExecuted(ICommandInfo commandInfo, IInteractionContext context_, IResult result)
         {
@@ -139,22 +155,7 @@ namespace Dynastio.Bot
                 case InteractionCommandError.Exception:
                     Title = context.Locale["unknown_error"];
                     Description = $"Reason: Unknown Error, this bug reported to the bot developer.";
-                    try
-                    {
-                        if (!Program.IsDebug())
-                        {
-                            var content = JsonConvert.SerializeObject(result) +
-                                          $"\nName: {commandInfo.Name}" +
-                                          $"\nMethodName: {commandInfo.MethodName}" +
-                                          $"\nUser: {context_.User.Id}";
-                            var channel = _client.GetGuild(_configuration.Guilds.MainServer).GetTextChannel(_configuration.Channels.ErrorLoggerChannel);
-                            await DiscordStream.SendStringAsFile(channel, content);
-                        }
-                    }
-                    catch
-                    {
-
-                    }
+                    await LogErrorAsync(commandInfo,context_,result).Try();
                     break;
                 default:
                     Title = context.Locale["unknown_error"];
