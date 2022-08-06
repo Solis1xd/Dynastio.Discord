@@ -8,6 +8,8 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 using Dynastio.Data;
+using SixLabors.ImageSharp;
+
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireUserDynastioAccount]
@@ -32,14 +34,69 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 ? Context.BotUser.GetAccount()
                 : Context.BotUser.GetAccount(int.Parse(account));
 
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
+
             var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id).TryGet();
             if (profile == null)
             {
                 await FollowupAsync("data not found.");
                 return;
             }
+
             var image = GraphicService.GetProfile(profile);
             var msg = await FollowupWithFileAsync(image, "profile.jpeg");
+        }
+
+        [RateLimit(3)]
+        [SlashCommand("rank", "your dynast.io rank")]
+        public async Task rank([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
+            bool Cache = true,
+            DynastioProviderType provider = DynastioProviderType.Main)
+        {
+            await DeferAsync();
+            var dynastioProvider = Dynastio[provider];
+
+            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
+                ? Context.BotUser.GetAccount()
+                : Context.BotUser.GetAccount(int.Parse(account));
+
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
+
+            var rank = await dynastioProvider.GetUserRanAsync(selectedAccount.Id).TryGet();
+            if (rank == null)
+            {
+                await FollowupAsync(embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
+                return;
+            }
+            IUser user = Context.User;
+            using (HttpClient httpClient = new())
+            {
+                byte[] data = await httpClient.GetByteArrayAsync(user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+
+                using (MemoryStream mem = new MemoryStream(data))
+                {
+                    using (var Avatar = SixLabors.ImageSharp.Image.Load(mem))
+                    {
+                        var img = GraphicService.GetRank(Avatar, rank, user.Username, user.Discriminator);
+                        using (var stream = new MemoryStream())
+                        {
+                            img.SaveAsJpeg(stream);
+                            img.Dispose();
+                            var msg = await FollowupWithFileAsync(stream, "img.jpeg", Context.BotUser.Id.ToUserMention());
+
+                        }
+                    }
+                }
+
+            }
         }
         [RateLimit(200, 3)]
         [RequireUserDynastioAccount]
@@ -56,6 +113,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
                ? Context.BotUser.GetAccount()
                : Context.BotUser.GetAccount(int.Parse(account));
+
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
 
             var result = await dynastioProvider.GetUserSurroundingRankAsync(selectedAccount.Id);
             if (result is null)
@@ -112,13 +175,22 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
 
-            UserAccount account_ = string.IsNullOrWhiteSpace(account) ? Context.BotUser.GetAccount() : Context.BotUser.GetAccount(int.Parse(account));
+            UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
+                ? Context.BotUser.GetAccount()
+                : Context.BotUser.GetAccount(int.Parse(account));
+
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
+
             string type = stat == StatType.Craft || stat == StatType.Gather || stat == StatType.Shop ? "item" : "entity";
             string property = stat.ToString().ToLower();
 
 
             var dynastioProvider = Dynastio[provider];
-            var stat_ = await dynastioProvider.GetUserStatAsync(account_.Id).TryGet();
+            var stat_ = await dynastioProvider.GetUserStatAsync(selectedAccount.Id).TryGet();
             if (stat_ is null)
             {
                 await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["data.not_found.description"].ToEmbed(this["data.not_found.title"]));
@@ -168,6 +240,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 ? Context.BotUser.GetAccount()
                 : Context.BotUser.GetAccount(int.Parse(account));
 
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
+
             var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id);
             string content =
                 $"Level: {profile.Details.Level}\n" +
@@ -200,6 +278,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     ? Context.BotUser.GetAccount()
                     : Context.BotUser.GetAccount(int.Parse(account));
 
+                if (selectedAccount is null)
+                {
+                    await FollowupAsync("account not found.");
+                    return;
+                }
+
                 var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id);
                 var content = profile.UnlockedSkins?.ToStringTable(new string[] { "#", "Unlocked Skins" },
                     a => profile.UnlockedSkins.IndexOf(a).ToRegularCounter(),
@@ -217,6 +301,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     ? Context.BotUser.GetAccount()
                     : Context.BotUser.GetAccount(int.Parse(account));
 
+                if (selectedAccount is null)
+                {
+                    await FollowupAsync("account not found.");
+                    return;
+                }
+
                 var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id);
                 var content = profile.UnlockedBuildings?.ToStringTable(new string[] { "#", "Unlocked Buildings" },
                     a => profile.UnlockedBuildings.IndexOf(a).ToRegularCounter(),
@@ -233,6 +323,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 UserAccount selectedAccount = string.IsNullOrWhiteSpace(account)
                     ? Context.BotUser.GetAccount()
                     : Context.BotUser.GetAccount(int.Parse(account));
+
+                if (selectedAccount is null)
+                {
+                    await FollowupAsync("account not found.");
+                    return;
+                }
 
                 var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id);
                 var content = profile.UnlockedRecipes?.ToStringTable(new string[] { "#", "Unlocked Recipes" },

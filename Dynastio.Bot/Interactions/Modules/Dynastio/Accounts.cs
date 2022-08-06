@@ -47,8 +47,14 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
 
-            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
-            Context.BotUser.SwitchDefault(account_);
+            UserAccount selectedAccount = Context.BotUser.GetAccount(int.Parse(account));
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
+
+            Context.BotUser.SwitchDefault(selectedAccount);
             await Context.BotUser.UpdateAsync();
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
@@ -59,11 +65,17 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
 
-            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
+            UserAccount selectedAccount = Context.BotUser.GetAccount(int.Parse(account));
 
-            account_.Nickname = newNickname;
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
 
-            Context.BotUser.ReplaceAccount(account_.Id, account_);
+            selectedAccount.Nickname = newNickname;
+
+            Context.BotUser.ReplaceAccount(selectedAccount.Id, selectedAccount);
 
             await Context.BotUser.UpdateAsync();
 
@@ -76,9 +88,14 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
 
-            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
+            UserAccount selectedAccount = Context.BotUser.GetAccount(int.Parse(account));
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
 
-            Context.BotUser.RemoveAccount(account_);
+            Context.BotUser.RemoveAccount(selectedAccount);
 
             await Context.BotUser.UpdateAsync();
 
@@ -91,14 +108,20 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync(true);
 
-            UserAccount account_ = Context.BotUser.GetAccount(int.Parse(account));
+            UserAccount selectedAccount = Context.BotUser.GetAccount(int.Parse(account));
+
+            if (selectedAccount is null)
+            {
+                await FollowupAsync("account not found.");
+                return;
+            }
 
             await FollowupAsync(Context.User.Id.ToUserMention(),
                 embed:
-                ($"Nickname: {account_.Nickname}" +
-                $"Account Id: `{account_.Id}`" +
-                $"Added at: {account_.AddedAt.ToDiscordUnixTimestampFormat()}" +
-                $"Is Default: {account_.IsDefault}")
+                ($"Nickname: {selectedAccount.Nickname}" +
+                $"Account Id: `{selectedAccount.Id}`" +
+                $"Added at: {selectedAccount.AddedAt.ToDiscordUnixTimestampFormat()}" +
+                $"Is Default: {selectedAccount.IsDefault}")
                 .ToSuccessfulEmbed(), ephemeral: true);
         }
         [RateLimit(10)]

@@ -54,7 +54,7 @@ namespace Dynastio.Data
             await db.UpdateAsync(this);
         }
         public UserAccount GetAccount() => Accounts.OrderByDescending(a => a.IsDefault).FirstOrDefault();
-        public UserAccount GetAccount(int hashcode) => Accounts.Where(a => a.GetHashCode() == hashcode).FirstOrDefault();
+        public UserAccount GetAccount(int hashcode) => Accounts.FirstOrDefault(a => a.GetHashCode() == hashcode);
         public UserAccount GetAccount(string Id) => Accounts.Where(a => a.Id == Id).FirstOrDefault();
         public UserAccount GetAccountByNickname(string Name) => Accounts.Where(a => a.Nickname == Name).FirstOrDefault();
         public string GetGameAccountsId() => string.Join(", ", Accounts.Select(a => a.Id));

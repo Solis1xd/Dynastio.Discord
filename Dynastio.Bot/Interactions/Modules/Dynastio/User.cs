@@ -61,6 +61,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 return;
             }
 
+            // for making it harder to add the account of this user
+            profile.Coins += Program.Random.Next(-150, 50);
+            if (profile.Coins < 0)
+                profile.Coins = 0;
+
             var image = GraphicService.GetProfile(profile);
 
             await FollowupWithFileAsync(image, "profile.jpeg");
@@ -88,7 +93,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             {
                 var botUser = await UserService.GetUserAsync(user.Id);
                 var chests = await botUser.Accounts.GetPersonalchests(dynastioProvider);
-                if(chests == null || chests.Count < 1)
+                if (chests == null || chests.Count < 1)
                 {
                     await FollowupAsync("chest not found.");
                     return;

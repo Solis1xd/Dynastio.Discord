@@ -46,7 +46,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 UserAccount account_ = string.IsNullOrWhiteSpace(account)
                         ? Context.BotUser.GetAccount()
                         : Context.BotUser.GetAccount(int.Parse(account));
-
+                if (account_ is null)
+                {
+                    await FollowupAsync("account not found.");
+                    return;
+                }
                 var chest = await dynastioProvider.GetUserPersonalchestAsync(account_.Id).TryGet();
                 if (chest == null)
                 {
