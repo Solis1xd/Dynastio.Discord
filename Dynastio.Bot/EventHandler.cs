@@ -36,7 +36,7 @@ namespace Dynastio.Bot
         private async Task _client_Ready()
         {
             await _client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await _client.SetGameAsync(Program.BotStatus, "", ActivityType.Playing);
+            await _client.SetGameAsync(_configuration.BotStatus, "", ActivityType.Playing);
 
             if (!Program.IsDebug())
             {
@@ -76,17 +76,17 @@ namespace Dynastio.Bot
             var gLeave = _client.Guilds.OrderBy(a => a.MemberCount).Where(a => true).FirstOrDefault();
             await gLeave.Owner.SendMessageAsync($"we are supporting 100 servers only, i invited to new server with more users, i have to leave from your server {gLeave.Name}.\n" +
                 $"The robot acts like an auction, whichever server has more members, the robot prefers that server.\n" +
-                $"You need more members\nSupport & More {Program.MainGuildInviteLink}").Try();
+                $"You need more members\nSupport & More {_configuration.Guilds.MainGuildInviteLink}").Try();
             await gLeave.LeaveAsync();
         }
         private async Task _client_UserJoined(SocketGuildUser arg)
         {
             await arg.SendMessageAsync(
-                text: "https://www.youtube.com/watch?v=x1tRXvcFJvs" + "\n" + Program.MainGuildInviteLink,
+                text: "https://www.youtube.com/watch?v=x1tRXvcFJvs" + "\n" + _configuration.Guilds.MainGuildInviteLink,
                 components: new ComponentBuilder()
-                        .WithButton("Как взломать монеты ?", null, ButtonStyle.Link, null, Program.YoutubeChannelLink)
-                        .WithButton("How To Hack Dynast.io ?", null, ButtonStyle.Link, null, Program.YoutubeChannelLink)
-                        .WithButton("Official Dynast.io Channel", null, ButtonStyle.Link, null, Program.MainGuildInviteLink)
+                        .WithButton("Как взломать монеты ?", null, ButtonStyle.Link, null, _configuration.DynastioYoutubeChannelId.ToYoutubeChannelSubConfirmation())
+                        .WithButton("How To Hack Dynast.io ?", null, ButtonStyle.Link, null, _configuration.DynastioYoutubeChannelId.ToYoutubeChannelSubConfirmation())
+                        .WithButton("Official Dynast.io Channel", null, ButtonStyle.Link, null, _configuration.DynastioYoutubeChannelId.ToYoutubeChannelSubConfirmation())
             .Build()).Try();
 
         }

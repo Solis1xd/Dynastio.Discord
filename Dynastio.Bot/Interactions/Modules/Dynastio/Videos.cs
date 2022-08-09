@@ -15,12 +15,78 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
     [Group("videos", "dynastio videos")]
     public class Videos : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
+        [RequireYoutubeService]
+        [Group("dyanstio", "dynastio channel videos")]
+        public class DynastioChannelModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
+        {
+            public YoutubeService Youtube { get; set; }
+
+            [RateLimit(5, 1)]
+            [SlashCommand("search", "search for a video")]
+            public async Task search([Autocomplete] string video)
+            {
+                await DeferAsync();
+                var result = Youtube.Videos.FirstOrDefault(a => a.Id.VideoId == video);
+                if(result == null)
+                {
+                    await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
+                    return;
+                }
+                await FollowupAsync(result.Id.ToUrl());
+                await FollowupAsync(
+                    embed:
+                    ($"**Title:** {result.Snippet.Title}\n" +
+                     $"**Description:** {result.Snippet.Description}\n" +
+                     $"**Link:** {result.Id.ToUrl()}\n" +
+                    $"**PublishedAt:** {result.Snippet.PublishedAt.Value.ToDiscordUnixTimestampFormat()}\n" +
+                    $"").ToEmbed(result.Snippet.Title, result.Snippet.Thumbnails.Default__.Url ?? ""));
+            }
+
+            [AutocompleteCommand("video", "search")]
+            public async Task AutoCompleteSearch()
+            {
+                var value = (string)(Context.Interaction as SocketAutocompleteInteraction).Data.Current.Value;
+                var videos = Youtube.Videos.Where(a => a.Snippet.Title.ToLower().Contains(value)).Take(25);
+                List<AutocompleteResult> results = new();
+                foreach (var video in videos)
+                {
+                    results.Add(new AutocompleteResult()
+                    {
+                        Name = StringExtensions.RemoveString(video.Snippet.Title, 90),
+                        Value = video.Id.VideoId
+                    });
+                }
+                await (Context.Interaction as SocketAutocompleteInteraction).RespondAsync(results);
+            }
+
+            [RateLimit(5, 2)]
+            [SlashCommand("random", "get a random video")]
+            [ComponentInteraction("videos.dynastio.random", true)]
+            public async Task random()
+            {
+                await DeferAsync();
+
+                var videos = Youtube.Videos;
+                if (videos == null || videos.Count == 0)
+                {
+                    await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
+                    return;
+                }
+                var index = Program.Random.Next(videos.Count);
+                var video = videos[index];
+
+                var componenets = new ComponentBuilder();
+                componenets.WithButton(this["next"], $"videos.dynastio.random", ButtonStyle.Success, new Emoji("⏩"), null, false, 0);
+
+                var message = await FollowupAsync(video.Id.ToUrl(), components: componenets.Build());
+            }
+        }
         [Group("featured", "featured videos")]
         public class FeaturedVideosModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             public DynastioClient Dynastio { get; set; }
 
-            [RateLimit(5,2)]
+            [RateLimit(5, 2)]
             [SlashCommand("random", "get a random video")]
             [ComponentInteraction("videos.featured.random:*:*", true)]
             public async Task random(LocalType local = LocalType.common, DynastioProviderType provider = DynastioProviderType.Main)
