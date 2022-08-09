@@ -91,7 +91,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 
             if (All)
             {
-                var botUser = await UserService.GetUserAsync(user.Id);
+                var botUser = await UserService.GetUserAsync(user.Id, false);
+                if(botUser == null)
+                {
+                    await FollowupAsync("user not found.");
+                    return;
+                }
                 var chests = await botUser.Accounts.GetPersonalchests(dynastioProvider);
                 if (chests == null || chests.Count < 1)
                 {
@@ -107,6 +112,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 if (dynastId == "")
                 {
                     var botUser = await UserService.GetUserAsync(user.Id);
+
                     selectedAccount = string.IsNullOrWhiteSpace(account)
                     ? botUser.GetAccount()
                     : botUser.GetAccount(int.Parse(account));
@@ -117,6 +123,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     {
                         Id = dynastId,
                     };
+                }
+
+                if (selectedAccount == null)
+                {
+                    await FollowupAsync("user not found.");
+                    return;
                 }
 
                 var chest = await dynastioProvider.GetUserPersonalchestAsync(selectedAccount.Id).TryGet();

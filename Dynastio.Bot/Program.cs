@@ -21,11 +21,9 @@ namespace Dynastio.Bot
         public const int ImageOnlyChannelsSlowMode = 30;
         public static Random Random = new Random();
         public static DateTime StartUp { get; } = DateTime.UtcNow;
-        public const string MainGuildInviteLink = "https://discord.gg/GVUXMNv7vV";
-        public const string YoutubeChannelLink = "https://www.youtube.com/channel/UCW0PmC1B8jjhpKLHciFp0xA/?sub_confirmation=1";
-        public const string BotStatus = "In Development";
         public const string FilePathConfigurationMain = @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.json";
         public const string FilePathConfigurationDebug = @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.debug.json";
+        public static bool IsYoutubeServiceInitialized = false;
         public static void Main(string[] arg) => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()
         {
@@ -59,6 +57,8 @@ namespace Dynastio.Bot
 
             var guildService = new GuildService(db);
 
+            var youtubeService = new YoutubeService(configuration.YoutubeApiKey, configuration.DynastioYoutubeChannelId);
+            await youtubeService.InitializeAsync();
 
             BsonClassMap.RegisterClassMap<User>(cm =>
             {
@@ -78,6 +78,7 @@ namespace Dynastio.Bot
                 .AddSingleton(userService)
                 .AddSingleton(guildService)
                 .AddSingleton(graphicService)
+                .AddSingleton(youtubeService)
                 .AddSingleton(_socketConfig)
                 .AddSingleton(languages)
                 .AddSingleton<DiscordSocketClient>()

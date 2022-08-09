@@ -23,6 +23,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [SlashCommand("chest", "your private chest")]
         public async Task personalChest(
             bool All = false,
+            bool CountItems = false,
             [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
             DynastioProviderType provider = DynastioProviderType.Main
             )
@@ -39,13 +40,40 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     return;
                 }
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
-                await FollowupWithFileAsync(image, "chest.jpeg");
+
+                string content = "";
+
+                if (CountItems)
+                {
+                    Dictionary<string, int> items = new();
+                    foreach (var chest in chests)
+                    {
+                        foreach (var item in chest.Items)
+                        {
+                            var count = item.Count;
+                            if (items.TryGetValue(item.ItemType.ToString(), out int v))
+                            {
+                                items[item.ItemType.ToString()] = v + count;
+                            }
+                            else
+                            {
+                                items.Add(item.ItemType.ToString(), count);
+                            }
+                        }
+                    }
+                    content = items.OrderByDescending(a=>a.Value).ToStringTable(new string[] { "Item", "Count" },
+                        a => a.Key,
+                        a => "x" + a.Value);
+                }
+
+                await FollowupWithFileAsync(image, "chest.jpeg", embed: content.ToMarkdown().ToEmbed(imageUrl: "attachment://chest.jpeg"));
             }
             else
             {
                 UserAccount account_ = string.IsNullOrWhiteSpace(account)
                         ? Context.BotUser.GetAccount()
                         : Context.BotUser.GetAccount(int.Parse(account));
+
                 if (account_ is null)
                 {
                     await FollowupAsync("account not found.");
