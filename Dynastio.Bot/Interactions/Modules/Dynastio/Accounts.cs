@@ -128,6 +128,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [SlashCommand("add", "connect new account to the bot")]
         public async Task addaccount()
         {
+            if (Context.BotUser.IsBannedToAddNewAccount)
+            {
+                await RespondAsync(embed: this["unauthorized"].ToDangerEmbed(this["unauthorized"]));
+                return;
+            }
+
             var modal = new ModalBuilder(this["add_account"], $"accounts add")
                .AddTextInput(new TextInputBuilder(this["nickname"], "nickname", TextInputStyle.Short, this["custom_nickname"], 1, 16, true, null))
                .AddTextInput(new TextInputBuilder(this["coin"], "coin", TextInputStyle.Short, this["account_coins_number"], 1, 16, true, null))
@@ -139,6 +145,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [ModalInteraction("accounts add", true)]
         public async Task add(AddAccountForm form)
         {
+            if (Context.BotUser.IsBannedToAddNewAccount)
+            {
+                await RespondAsync(embed: this["unauthorized"].ToDangerEmbed(this["unauthorized"]));
+                return;
+            }
+
             await DeferAsync();
 
             if (!int.TryParse(form.Coins, out int value))

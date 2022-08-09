@@ -23,7 +23,8 @@ namespace Dynastio.Data
         public List<UserAccount> Accounts { get; set; } = new();
         public DateTime LastHonorGift { get; set; } = DateTime.MinValue;
         public int Honor { get; set; } = 0;
-
+        public bool IsBannedToAddNewAccount { get; set; } = false;
+        public bool IsBanned { get; set; } = false;
         public void AddAccount(UserAccount account)
         {
             UserAccount.AssignAccountName(this, ref account);

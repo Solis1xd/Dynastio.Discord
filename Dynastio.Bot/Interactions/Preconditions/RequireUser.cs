@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Discord;
 using Dynastio;
 using Dynastio.Bot;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Interactions
 {
@@ -20,12 +21,35 @@ namespace Discord.Interactions
         public RequireUserType? RequireType { get; }
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
-            if (RequireType.HasValue && RequireType.Value == RequireUserType.Mention)
+            if (RequireType.HasValue)
             {
-                if (context.Interaction is SocketMessageComponent componentContext)
+                switch (RequireType.Value)
                 {
-                    if (componentContext.Message.MentionedUsers.Select(a => a.Id).Contains(context.User.Id))
-                        return Task.FromResult(PreconditionResult.FromSuccess());
+                    case RequireUserType.Mention:
+                        {
+                            if (context.Interaction is SocketMessageComponent componentContext)
+                            {
+                                if (componentContext.Message.MentionedUsers.Select(a => a.Id).Contains(context.User.Id))
+                                    return Task.FromResult(PreconditionResult.FromSuccess());
+                            }
+                        }
+                        break;
+                    case RequireUserType.MainGuildOwner:
+                        {
+                            var config = services.GetRequiredService<Configuration>();
+                            var guildId = config.Guilds.MainServer;
+                            var ownerId = (context.Client as DiscordSocketClient).GetGuild(guildId).OwnerId;
+                            if (ownerId == context.User.Id)
+                                return Task.FromResult(PreconditionResult.FromSuccess());
+                        }
+                        break;
+                    case RequireUserType.BotOwner:
+                        {
+                            var config = services.GetRequiredService<Configuration>();
+                            if (config.OwnerId == context.User.Id)
+                                return Task.FromResult(PreconditionResult.FromSuccess());
+                        }
+                        break;
                 }
             }
 
@@ -33,7 +57,9 @@ namespace Discord.Interactions
         }
         public enum RequireUserType
         {
-            Mention
+            Mention,
+            MainGuildOwner,
+            BotOwner
         }
     }
 }

@@ -24,6 +24,11 @@ namespace Dynastio.Bot
             this.dynastioClient = dynastioClient;
 
         }
+        public int GetCacheCount() => users.Count;
+        public void ClearCache()
+        {
+            users.Clear();
+        }
         public async Task<bool> UpdateAsync(User user)
         {
             await db.UpdateAsync(user);

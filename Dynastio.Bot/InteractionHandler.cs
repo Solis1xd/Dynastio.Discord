@@ -78,6 +78,8 @@ namespace Dynastio.Bot
             if (!InteractionUtilities.IsStaticInteractionCommand(interaction)) return;
 
             var user = await userService.GetUserAsync(interaction.User.Id);
+            if (user.IsBanned) return;
+
             var locale = localeService[interaction.UserLocale];
             var guild = await _guildservice.GetGuildAsync(interaction.GuildId.Value);
 
@@ -155,7 +157,7 @@ namespace Dynastio.Bot
                 case InteractionCommandError.Exception:
                     Title = context.Locale["unknown_error"];
                     Description = $"Reason: Unknown Error, this bug reported to the bot developer.";
-                    await LogErrorAsync(commandInfo,context_,result).Try();
+                    await LogErrorAsync(commandInfo, context_, result).Try();
                     break;
                 default:
                     Title = context.Locale["unknown_error"];

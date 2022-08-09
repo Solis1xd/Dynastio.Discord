@@ -1,3 +1,4 @@
+
 0.5.2 - 09/08/2022
 - fixed bugs related to connected accounts
 - command "/rank" changed to "/profile rank"

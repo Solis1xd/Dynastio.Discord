@@ -17,6 +17,7 @@ namespace Dynastio.Bot
         public string YoutubeApiKey { get; set; }
         public string DynastioYoutubeChannelId { get; set; }
         public string DatabaseConnectionString { get; set; }
+        public ulong OwnerId { get; set; }
         public GuildsConfiguration Guilds { get; set; }
         public ChannelsConfiguration Channels { get; set; }
 
