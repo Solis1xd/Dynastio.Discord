@@ -32,17 +32,18 @@ namespace Discord.Interactions
                 RateLimitType.Global => 0,
                 _ => 0
             };
-            
+
             var contextId = _baseType switch
             {
                 RateLimitBaseType.BaseOnCommandInfo => commandInfo.Module.Name + "//" + commandInfo.Name + "//" + commandInfo.MethodName,
                 RateLimitBaseType.BaseOnCommandInfoHashCode => commandInfo.GetHashCode().ToString(),
-                RateLimitBaseType.BaseOnSlashCommandName=> (context.Interaction as SocketSlashCommand).CommandName,
+                RateLimitBaseType.BaseOnSlashCommandName => (context.Interaction as SocketSlashCommand).CommandName,
                 RateLimitBaseType.BaseOnMessageComponentCustomId => (context.Interaction as SocketMessageComponent).Data.CustomId,
                 RateLimitBaseType.BaseOnAutocompleteCommandName => (context.Interaction as SocketAutocompleteInteraction).Data.CommandName,
                 RateLimitBaseType.BaseOnApplicationCommandName => (context.Interaction as SocketApplicationCommand).Name,
                 _ => "unknown"
             };
+
             var dateTime = DateTime.UtcNow;
 
             var target = Items.GetOrAdd(id, new List<RateLimitItem>());
@@ -50,22 +51,24 @@ namespace Discord.Interactions
             var commands = target.Where(
                 a =>
                 a.command == contextId
-            ).ToList();
+            );
 
-            foreach (var c in commands)
+            foreach (var c in commands.ToList())
                 if (dateTime >= c.expireAt)
                     target.Remove(c);
-            
-            if (commands.Count > _requests)
-                return Task.FromResult(PreconditionResult.FromError($"{_context} using this command very fast, you can use this command every {_seconds} seconds, wait a while."));
 
-            target.Add(new RateLimitItem()
+
+            if (commands.Count() < _requests)
             {
-                command = contextId,
-                expireAt = DateTime.UtcNow + TimeSpan.FromSeconds(_seconds)
-            });
+                target.Add(new RateLimitItem()
+                {
+                    command = contextId,
+                    expireAt = DateTime.UtcNow + TimeSpan.FromSeconds(_seconds)
+                });
+                return Task.FromResult(PreconditionResult.FromSuccess());
+            }
 
-            return Task.FromResult(PreconditionResult.FromSuccess());
+            return Task.FromResult(PreconditionResult.FromError($"{_context} using this command very fast, you can use this command every {_seconds} seconds, wait a while."));
         }
         private class RateLimitItem
         {

@@ -50,8 +50,9 @@ namespace Dynastio.Bot
                 ? new MongoDb(configuration.DatabaseConnectionString)
                 : new NoDatabaseDb();
 
-            var dynastClient = new DynastioClient(configuration.DynastioApi);
             db = await db.InitializeAsync();
+
+            var dynastClient = new DynastioClient(configuration.DynastioApi);
 
             var userService = new UserService(db, dynastClient);
 
