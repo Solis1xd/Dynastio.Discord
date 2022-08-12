@@ -17,6 +17,19 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
     [Group("bot-owner", "bot owner commands")]
     public class BotOwnerModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
+        YoutubeService youtubeService { get; set; }
+
+        [SlashCommand("send-all-youtube-videos", "send all youtube videos")]
+        public async Task sendAllYoutubeVideos()
+        {
+            await DeferAsync();
+            foreach (var v in youtubeService.Videos)
+            {
+                await FollowupAsync($"{v.Id.ToYoutubeVideoUrl()}");
+                await Task.Delay(1000);
+            }
+        }
+
         [Group("bot-users", "users commands")]
         public class UsersModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {

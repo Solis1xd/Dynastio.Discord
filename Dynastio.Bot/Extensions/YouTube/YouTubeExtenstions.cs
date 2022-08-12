@@ -9,7 +9,7 @@ namespace Dynastio.Bot
 {
     public static class YouTubeExtenstions
     {
-        public static string ToUrl(this ResourceId id)
+        public static string ToYoutubeVideoUrl(this ResourceId id)
         {
             return "https://youtu.be/" + id.VideoId;
         }

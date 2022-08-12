@@ -32,12 +32,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
                     return;
                 }
-                await FollowupAsync(result.Id.ToUrl());
+                await FollowupAsync(result.Id.ToYoutubeVideoUrl());
                 await FollowupAsync(
                     embed:
                     ($"**Title:** {result.Snippet.Title}\n" +
                      $"**Description:** {result.Snippet.Description}\n" +
-                     $"**Link:** {result.Id.ToUrl()}\n" +
+                     $"**Link:** {result.Id.ToYoutubeVideoUrl()}\n" +
                     $"**PublishedAt:** {result.Snippet.PublishedAt.Value.ToDiscordUnixTimestampFormat()}\n" +
                     $"").ToEmbed(result.Snippet.Title, result.Snippet.Thumbnails.Default__.Url ?? ""));
             }
@@ -78,7 +78,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 var componenets = new ComponentBuilder();
                 componenets.WithButton(this["next"], $"videos.dynastio.random", ButtonStyle.Success, new Emoji("⏩"), null, false, 0);
 
-                var message = await FollowupAsync(video.Id.ToUrl(), components: componenets.Build());
+                var message = await FollowupAsync(video.Id.ToYoutubeVideoUrl(), components: componenets.Build());
             }
         }
         [Group("featured", "featured videos")]
