@@ -53,12 +53,10 @@ namespace Discord.Interactions
             ).ToList();
 
             foreach (var c in commands)
-            {
                 if (dateTime >= c.expireAt)
                     target.Remove(c);
-            }
-
-            if (commands.Count >= _requests)
+            
+            if (commands.Count > _requests)
                 return Task.FromResult(PreconditionResult.FromError($"{_context} using this command very fast, you can use this command every {_seconds} seconds, wait a while."));
 
             target.Add(new RateLimitItem()
