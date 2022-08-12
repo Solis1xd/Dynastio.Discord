@@ -15,7 +15,11 @@ namespace Dynastio.Bot
         public List<SearchResult> Videos { get; set; }
         public YoutubeService(string apiKey, string mainChannelId)
         {
-            if (apiKey == null || mainChannelId == null) return;
+            if (apiKey == null || mainChannelId == null)
+            {
+                Program.Log("YoutubeService", "api key not found.");
+                return;
+            }
             Program.IsYoutubeServiceInitialized = true;
 
             youtube = new YouTubeService(new Google.Apis.Services.BaseClientService.Initializer()
@@ -26,10 +30,18 @@ namespace Dynastio.Bot
         }
         public async Task InitializeAsync()
         {
-            if (!Program.IsYoutubeServiceInitialized)
-                return;
+            Program.Log("YoutubeService", "Initializing..");
 
-                Videos = await GetChannelVideos(mainChannelId);
+            if (!Program.IsYoutubeServiceInitialized)
+            {
+                Program.Log("YoutubeService", "Not Initialized.");
+                return;
+            }
+
+            Program.Log("YoutubeService", "Get channel videos..");
+            Videos = await GetChannelVideos(mainChannelId);
+
+            Program.Log("YoutubeService", "Initialized.");
         }
         public Task<List<SearchResult>> GetChannelVideos(string channelId)
         {

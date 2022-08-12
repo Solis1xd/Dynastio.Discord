@@ -101,24 +101,28 @@ I have tried to implement all the available Apis in the bot, The bot uses a free
 
 1. Bot configuration example:
   
- ```json
+```json
 {
   "BotToken": "Discord_Bot_Token",
   "DynastioApi":"Dynastio_Api_Token",
-  "DatabaseConnectionString": "Your_DB_Connection_String",
+  "YoutubeApiKey":"Youtube_Api_Key",
+  "DynastioYoutubeChannelId":"UCW0PmC1B8jjhpKLHciFp0xA",
+  "DatabaseConnectionString": "Your_Database_String_Connection", // MongoDB
+  "BotStatus":"In Development",
+  "OwnerId":805534924622004274,                                  //your discord user id
   "Guilds": {
-    "MainServer": 875716592770637824,
-    "DebugServer": 941235983284830208,
+    "MainServer": 875716592770637824,                        // your discord server id
+    "DebugServer": 941235983284830208,                       // your discord server id
+	"MainGuildInviteLink":"https://discord.gg/GVUXMNv7vV",   // your discord server
   },
   "Channels": {
-    "JoinLeftLoggerChannel": 918560623573495918,
-	"ErrorLoggerChannel":948672329813209118,
-	"HonorChannel":939878098873233438,
-	"UploadsChannel":988054411014180874
+    "JoinLeftLoggerChannel": 918560623573495918, // discord channel id
+	"ErrorLoggerChannel":948672329813209118,     // discord channel id
+	"HonorChannel":939878098873233438,           // discord channel id
+	"UploadsChannel":988054411014180874,         // discord channel id
   }
 }
 ```
-  
   
 
 ### Prerequisites

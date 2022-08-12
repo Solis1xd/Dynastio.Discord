@@ -23,4 +23,5 @@ namespace Dynastio.Bot.Interactions.Modules
             await FollowupAsync($"Pong ! Roundtrip latency: ` {Context.Client.Latency} `, Startup: {Program.StartUp.ToDiscordUnixTimestampFormat()}");
         }
     }
+
 }
