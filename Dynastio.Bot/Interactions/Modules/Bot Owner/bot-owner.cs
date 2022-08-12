@@ -17,18 +17,53 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
     [Group("bot-owner", "bot owner commands")]
     public class BotOwnerModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
-        YoutubeService youtubeService { get; set; }
+        public YoutubeService youtubeService { get; set; }
 
-        [SlashCommand("send-all-youtube-videos", "send all youtube videos")]
-        public async Task sendAllYoutubeVideos()
+        [SlashCommand("youtube-channel-videos", "send all youtube videos of a channel")]
+        public async Task sendAllYoutubeVideos(string channelId = "", YoutubeVideoOrderByType orderby = YoutubeVideoOrderByType.OrderByDescending, int take = 1, int skip = 0)
         {
             await DeferAsync();
-            foreach (var v in youtubeService.Videos)
+
+            var videos = channelId.IsNullOrEmpty()
+                ? youtubeService.Videos
+                : await youtubeService.GetAllChannelVideos(channelId).TryGet();
+
+            if(videos == null)
             {
-                await FollowupAsync($"{v.Id.ToYoutubeVideoUrl()}");
+                await FollowupAsync(embed: $"no video found.".ToEmbed());
+                return;
+            }
+
+            videos = orderby == YoutubeVideoOrderByType.OrderBy
+                ? videos.OrderBy(a => a.Snippet.PublishedAt).ToList()
+                : videos.OrderByDescending(a => a.Snippet.PublishedAt).ToList();
+
+            videos = videos.Skip(skip).Take(take).ToList();
+
+            if (videos == null)
+            {
+                await FollowupAsync(embed: $"no video found after the filters.".ToEmbed());
+                return;
+            }
+
+            foreach (var v in videos)
+            {
+                await FollowupAsync(v.Id.ToYoutubeVideoUrl());
                 await Task.Delay(1000);
             }
+
+            var msg = await FollowupAsync(embed: $"{videos.Count} videos uploaded to the channel. `this message will be delete after 5 seconds.`".ToEmbed());
+            await Task.Delay(15000);
+            await msg.DeleteAsync();
+
         }
+        public enum YoutubeVideoOrderByType
+        {
+            OrderBy,
+            OrderByDescending,
+        }
+
+
 
         [Group("bot-users", "users commands")]
         public class UsersModule : CustomInteractionModuleBase<CustomSocketInteractionContext>

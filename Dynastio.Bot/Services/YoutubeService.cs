@@ -39,11 +39,11 @@ namespace Dynastio.Bot
             }
 
             Program.Log("YoutubeService", "Get channel videos..");
-            Videos = await GetChannelVideos(mainChannelId);
+            Videos = await GetAllChannelVideos(mainChannelId);
 
             Program.Log("YoutubeService", "Initialized.");
         }
-        public Task<List<SearchResult>> GetChannelVideos(string channelId)
+        public Task<List<SearchResult>> GetAllChannelVideos(string channelId)
         {
             List<SearchResult> res = new List<SearchResult>();
 
@@ -68,5 +68,16 @@ namespace Dynastio.Bot
             }
             return Task.FromResult(res);
         }
+        public Task<List<SearchResult>> SearchVideoByKeyword(string keyword)
+        {
+            var searchListRequest = youtube.Search.List("snippet");
+            searchListRequest.MaxResults = 50;
+            searchListRequest.Q = keyword;
+            searchListRequest.Type = "video";
+
+            var searchListResponse = searchListRequest.Execute();
+            return Task.FromResult(searchListResponse.Items.ToList());
+        }
+
     }
 }
