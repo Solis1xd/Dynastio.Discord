@@ -11,6 +11,7 @@ using Discord.WebSocket;
 
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.AttachFiles)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
@@ -18,7 +19,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
     {
         public DynastioClient Dynastio { get; set; }
 
-        [RateLimit(10, 1, RateLimit.RateLimitType.User)]
+        [RateLimit(10, 2, RateLimit.RateLimitType.User)]
         [SlashCommand("server", "get server information")]
         public async Task server(
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",

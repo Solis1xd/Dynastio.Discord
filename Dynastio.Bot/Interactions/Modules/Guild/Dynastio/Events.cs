@@ -11,6 +11,7 @@ using Discord.WebSocket;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RateLimit(60, 1, RateLimit.RateLimitType.User)]

@@ -11,6 +11,7 @@ using Discord.WebSocket;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RateLimit(60, 1, RateLimit.RateLimitType.User)]
@@ -22,8 +23,8 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public async Task version(DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
-            var version = Dynastio[provider].GetCurrentVersionAsync();
-            var message = await FollowupAsync(embed: $"Dynastio Current Version {provider} Is {version}".ToEmbed("Dynastio Version"));
+            var version = await Dynastio[provider].GetCurrentVersionAsync();
+            var message = await FollowupAsync(embed: $"Dynastio Current Version {provider} Is **{version.CurrentVersion}** (Download)[{version.DownloadUrl}]".ToEmbed("Dynastio Version"));
         }
     }
 }

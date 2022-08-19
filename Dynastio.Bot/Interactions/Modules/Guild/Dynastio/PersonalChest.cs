@@ -11,6 +11,7 @@ using Dynastio.Data;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.AttachFiles)]
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RateLimit(20, 1, RateLimit.RateLimitType.User)]
     [Group("personal", "your personal details")]

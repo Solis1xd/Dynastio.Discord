@@ -8,9 +8,10 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.Modules
+namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
 {
 
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [RequireBotPermission(GuildPermission.ModerateMembers)]

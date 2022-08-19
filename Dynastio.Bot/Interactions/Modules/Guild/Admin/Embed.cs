@@ -11,8 +11,9 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.ComponentModel;
 
-namespace Dynastio.Bot.Interactions.Modules.Administrator
+namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
 {
+    [EnabledInDm(false)]
     [Group("embed", "embed utilities")]
     [RequireContext(ContextType.Guild)]
     [DefaultMemberPermissions(GuildPermission.Administrator)]

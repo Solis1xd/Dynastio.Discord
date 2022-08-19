@@ -11,8 +11,9 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 
 
-namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
+namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
 {
+    [EnabledInDm(false)]
     [Group("channel", "server configuration")]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
@@ -67,7 +68,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
             public async Task list()
             {
                 await DeferAsync();
-                var content = string.Join("\n", Context.BotGuild.OnlyImageChannels.Select(a => Discord.MentionUtils.MentionChannel(a)).ToArray());
+                var content = string.Join("\n", Context.BotGuild.OnlyImageChannels.Select(a => MentionUtils.MentionChannel(a)).ToArray());
                 await FollowupAsync(embed: content.ToEmbed("Image-only channels"));
             }
             [SlashCommand("remove", "Image Channels")]
@@ -87,6 +88,6 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
                 }
             }
         }
-        
+
     }
 }
