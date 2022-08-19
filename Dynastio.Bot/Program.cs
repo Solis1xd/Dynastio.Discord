@@ -137,5 +137,6 @@ namespace Dynastio.Bot
                 return false;
 #endif
         }
+
     }
 }
