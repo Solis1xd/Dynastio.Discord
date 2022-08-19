@@ -13,59 +13,63 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireUser(RequireUserAttribute.RequireUserType.BotOwner)]
     [RequireContext(ContextType.Guild)]
+    [EnabledInDm(false)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    [Group("bot-owner", "bot owner commands")]
-    public class BotOwnerModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
+    [Group("developer", "bot developer commands")]
+    public class DeveloperModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
-        public YoutubeService youtubeService { get; set; }
-
-        [SlashCommand("youtube-channel-videos", "send all youtube videos of a channel")]
-        public async Task sendAllYoutubeVideos(string channelId = "", YoutubeVideoOrderByType orderby = YoutubeVideoOrderByType.OrderByDescending, int take = 1, int skip = 0)
+        [Group("youtube", "users commands")]
+        public class YoutubeModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
-            await DeferAsync();
+            public YoutubeService youtubeService { get; set; }
 
-            var videos = channelId.IsNullOrEmpty()
-                ? youtubeService.Videos
-                : await youtubeService.GetAllChannelVideos(channelId).TryGet();
-
-            if(videos == null)
+            [SlashCommand("videos", "send all youtube videos of a channel")]
+            public async Task sendAllYoutubeVideos(string channelId = "", YoutubeVideoOrderByType orderby = YoutubeVideoOrderByType.OrderByDescending, int take = 1, int skip = 0)
             {
-                await FollowupAsync(embed: $"no video found.".ToEmbed());
-                return;
+                await DeferAsync();
+
+                var videos = channelId.IsNullOrEmpty()
+                    ? youtubeService.Videos
+                    : await youtubeService.GetAllChannelVideos(channelId).TryGet();
+
+                if (videos == null)
+                {
+                    await FollowupAsync(embed: $"no video found.".ToEmbed());
+                    return;
+                }
+
+                videos = orderby == YoutubeVideoOrderByType.OrderBy
+                    ? videos.OrderBy(a => a.Snippet.PublishedAt).ToList()
+                    : videos.OrderByDescending(a => a.Snippet.PublishedAt).ToList();
+
+                videos = videos.Skip(skip).Take(take).ToList();
+
+                if (videos == null)
+                {
+                    await FollowupAsync(embed: $"no video found after the filters.".ToEmbed());
+                    return;
+                }
+
+                foreach (var v in videos)
+                {
+                    await FollowupAsync(v.Id.ToYoutubeVideoUrl());
+                    await Task.Delay(1000);
+                }
+
+                var msg = await FollowupAsync(embed: $"{videos.Count} videos uploaded to the channel. `this message will be delete after 5 seconds.`".ToEmbed());
+                await Task.Delay(15000);
+                await msg.DeleteAsync();
+
             }
-
-            videos = orderby == YoutubeVideoOrderByType.OrderBy
-                ? videos.OrderBy(a => a.Snippet.PublishedAt).ToList()
-                : videos.OrderByDescending(a => a.Snippet.PublishedAt).ToList();
-
-            videos = videos.Skip(skip).Take(take).ToList();
-
-            if (videos == null)
+            public enum YoutubeVideoOrderByType
             {
-                await FollowupAsync(embed: $"no video found after the filters.".ToEmbed());
-                return;
+                OrderBy,
+                OrderByDescending,
             }
-
-            foreach (var v in videos)
-            {
-                await FollowupAsync(v.Id.ToYoutubeVideoUrl());
-                await Task.Delay(1000);
-            }
-
-            var msg = await FollowupAsync(embed: $"{videos.Count} videos uploaded to the channel. `this message will be delete after 5 seconds.`".ToEmbed());
-            await Task.Delay(15000);
-            await msg.DeleteAsync();
-
         }
-        public enum YoutubeVideoOrderByType
-        {
-            OrderBy,
-            OrderByDescending,
-        }
 
 
-
-        [Group("bot-users", "users commands")]
+        [Group("users", "users commands")]
         public class UsersModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             public UserService userManager { get; set; }

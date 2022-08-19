@@ -13,6 +13,7 @@ using SixLabors.ImageSharp;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireUserDynastioAccount]
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.AttachFiles | ChannelPermission.SendMessages | ChannelPermission.EmbedLinks)]
     [Group("profile", "dynastio profile")]

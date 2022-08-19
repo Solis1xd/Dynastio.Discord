@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Dynastio.Bot.Modules.Interactions
 {
-   
+    [EnabledInDm(false)]
     [RequireGuild(RequireGuild.LocalGuildId.Main)]
     [RequireChannel(RequireChannel.LocalChannelId.Honor)]
     [RequireBotPermission(ChannelPermission.SendMessages)]

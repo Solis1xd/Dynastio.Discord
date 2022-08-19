@@ -21,8 +21,8 @@ namespace Dynastio.Bot
         public const int ImageOnlyChannelsSlowMode = 30;
         public static Random Random = new Random();
         public static DateTime StartUp { get; } = DateTime.UtcNow;
-        public const string FilePathConfigurationMain = @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.json";
-        public const string FilePathConfigurationDebug = @"C:\Users\Zhaleh\OneDrive\projects\Dynastio\dynastio.debug.json";
+        public const string FilePathConfigurationMain = @"J:\Members\Jaleh Jalal\projects\Dynastio\dynastio.json";
+        public const string FilePathConfigurationDebug = @"J:\Members\Jaleh Jalal\projects\Dynastio\dynastio.debug.json";
         public static bool IsYoutubeServiceInitialized = false;
         public static void Main(string[] arg) => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()
@@ -43,11 +43,12 @@ namespace Dynastio.Bot
             var graphicService = new GraphicService().Initialize();
 
             IDynastioBotDatabase db =
-                configuration.DatabaseConnectionString.IsNullOrEmpty()
+                !configuration.DatabaseConnectionString.IsNullOrEmpty()
                 ? new NoDatabaseDb()
+                
                 : configuration.DatabaseConnectionString.Contains("mongodb")
-
                 ? new MongoDb(configuration.DatabaseConnectionString)
+                
                 : new NoDatabaseDb();
 
             db = await db.InitializeAsync();

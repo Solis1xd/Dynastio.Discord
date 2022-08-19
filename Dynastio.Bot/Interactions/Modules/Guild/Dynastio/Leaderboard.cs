@@ -10,6 +10,7 @@ using Dynastio.Data;
 
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [Group("leaderboard", "dynast.io leaderboard")]

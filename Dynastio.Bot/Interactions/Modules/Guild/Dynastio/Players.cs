@@ -12,6 +12,7 @@ using Discord.WebSocket;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.AttachFiles)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
@@ -86,7 +87,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
             var botUser = await UserService.GetUserAsync(user.Id, false);
-            if (botUser.Accounts.Count == 0)
+            if (botUser is null || botUser.Accounts == null || botUser.Accounts.Count == 0)
             {
                 await FollowupAsync(embed: "No any account of this user found.".ToWarnEmbed("Not Found !"));
                 return;
@@ -101,6 +102,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             }
 
             var team = Dynastio[provider].OnlinePlayers.GroupBy(a => a.Team).FirstOrDefault(a => a.Key == result.Team && !string.IsNullOrEmpty(a.Key));
+
             var teammates = team is null ? "`none`" : string.Join(", ", team.Select(a => a.Nickname));
             string content =
                 $"**Nickname:** {result.Nickname.RemoveString(18)}\n" +

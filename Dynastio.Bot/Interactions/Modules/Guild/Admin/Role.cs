@@ -11,11 +11,13 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.ComponentModel;
 
-namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
+namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
 {
+    [EnabledInDm(false)]
     [Group("role", "role manager")]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(GuildPermission.ManageRoles)]
+    [DefaultMemberPermissions(GuildPermission.Administrator)]
     public class RoleModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         [RequireUserPermission(GuildPermission.Administrator)]
@@ -155,7 +157,7 @@ namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
 
             var role = Context.Guild.GetRole(ulong.Parse(roleId));
 
-            var user = (Context.User as IGuildUser);
+            var user = Context.User as IGuildUser;
 
             bool hasRole = user.RoleIds.Contains(role.Id);
 

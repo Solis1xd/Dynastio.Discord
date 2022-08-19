@@ -11,8 +11,9 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 
 
-namespace Dynastio.Bot.Interactions.SlashCommands.Administrator
+namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
 {
+    [EnabledInDm(false)]
     [Group("guild", "server commands")]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]

@@ -12,6 +12,7 @@ using Discord.WebSocket;
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
 
+    [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.AttachFiles)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
@@ -20,7 +21,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public GraphicService GraphicService { get; set; }
         public DynastioClient Dynastio { get; set; }
 
-        [RateLimit(8, 1, RateLimit.RateLimitType.User)]
+        [RateLimit(8, 2, RateLimit.RateLimitType.User)]
         [SlashCommand("toplist", "a list of top players")]
         public async Task toplist(
               [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
