@@ -8,12 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynastio.Data;
+using Dynastio.Bot.Interactions.Modules.Shard;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
+    [RequireDatabase]
     [Group("accounts", "your dynast.io accounts settings")]
     public class AccountsModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
@@ -31,13 +33,15 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 {
                     Title = this["accounts.account.title"],
                     Description = this["accounts.account.description"] + "\n" +
-                                  ((Context.BotUser.Accounts?.ToStringTable(new string[] { "#", this["account"], this["added_at"] },
+                                  ((Context.BotUser.Accounts?.ToStringTable(new string[] { "#", this["account"] + " |", "Description |", "Default |", "Service |", this["added_at"] },
                                   a => Context.BotUser.Accounts.IndexOf(a) + 1,
                                   a => a.Nickname,
+                                  a => a.Description,
+                                  a => a.IsDefault ? "Yes" : "No",
+                                  a => a.GetAccountService(),
                                   a => a.AddedAt.ToRelative()) + "                 ")
                                   .ToMarkdown() ?? this["no_account_found"].ToMarkdown()),
                     Color = Color.Orange,
-                    ThumbnailUrl = "https://cdn.discordapp.com/attachments/916998929609023509/956252644551323658/logo.jpg",
                     Url = "https://www.youtube.com/channel/UCW0PmC1B8jjhpKLHciFp0xA/?sub_confirmation=1"
                 }.Build());
         }
@@ -62,7 +66,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [RequireUserDynastioAccount]
         [RateLimit(5)]
         [SlashCommand("edit", "edit your added account")]
-        public async Task edit([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account, string newNickname)
+        public async Task edit([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account, EditType section, string newValue)
         {
             await DeferAsync();
 
@@ -74,7 +78,18 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 return;
             }
 
-            selectedAccount.Nickname = newNickname;
+            switch (section)
+            {
+                case EditType.Nickname:
+                    selectedAccount.Nickname = newValue.TrySubstring(16, false);
+                    break;
+                case EditType.Reminder:
+                    selectedAccount.Reminder = newValue.TrySubstring(150, false);
+                    break;
+                case EditType.Description:
+                    selectedAccount.Description = newValue.TrySubstring(50, false);
+                    break;
+            }
 
             Context.BotUser.ReplaceAccount(selectedAccount.Id, selectedAccount);
 
@@ -82,8 +97,16 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
+        public enum EditType
+        {
+            Nickname,
+            Reminder,
+            Description
+        }
+
         [RequireUserDynastioAccount]
         [RateLimit(3)]
+        [RequireConfirmation]
         [SlashCommand("remove", "remove a connected account")]
         public async Task remove([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
         {
@@ -103,8 +126,8 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_removed"].ToSuccessfulEmbed("account_removed"));
         }
         [RequireUserDynastioAccount]
-        [RateLimit(4, 2)]
-        [SlashCommand("get", "get a connected account details")]
+        [RateLimit(5, 2)]
+        [SlashCommand("details", "get a connected account details")]
         public async Task id([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account)
         {
             await DeferAsync(true);
@@ -118,20 +141,27 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             }
 
             await FollowupAsync(Context.User.Id.ToUserMention(),
-                embed:
-                ($"Nickname: {selectedAccount.Nickname}" +
-                $"Account Id: `{selectedAccount.Id}`" +
-                $"Added at: {selectedAccount.AddedAt.ToDiscordUnixTimestampFormat()}" +
-                $"Is Default: {selectedAccount.IsDefault}")
-                .ToSuccessfulEmbed(), ephemeral: true);
+                embed: (
+                $"\nNickname: {selectedAccount.Nickname}" +
+                $"\nAccount Id: `{selectedAccount.Id}`" +
+                $"\nDescription: `{selectedAccount.Description}`" +
+                $"\nAccount Service: `{selectedAccount.GetAccountService()}`" +
+                $"\nAdded at: {selectedAccount.AddedAt.ToDiscordUnixTimestampFormat()}" +
+                $"\nIs Default: {selectedAccount.IsDefault}" +
+                $"\nReminder: ```{selectedAccount.Reminder}```"
+                ).ToSuccessfulEmbed(), ephemeral: true);
         }
         [RateLimit(10)]
         [SlashCommand("add", "connect new account to the bot")]
+        [RequireConfirmation(
+            "Warning",
+            "Warning: Make sure the account you are trying to connect is your own, otherwise we reserve the right to block your access to the bot.",
+            50, "Its My Own Account", "Its not my account")]
         public async Task addaccount()
         {
             if (Context.BotUser.IsBannedToAddNewAccount)
             {
-                await RespondAsync(embed: this["unauthorized"].ToDangerEmbed(this["unauthorized"]));
+                await FollowupAsync(embed: this["unauthorized"].ToDangerEmbed(this["unauthorized"]));
                 return;
             }
 
@@ -139,9 +169,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                .AddTextInput(new TextInputBuilder(this["nickname"], "nickname", TextInputStyle.Short, this["custom_nickname"], 1, 16, true, null))
                .AddTextInput(new TextInputBuilder(this["coin"], "coin", TextInputStyle.Short, this["account_coins_number"], 1, 16, true, null))
                .AddTextInput(new TextInputBuilder(this["account_id"], "id", TextInputStyle.Short, "google:00000000000000000000", 1, 150, true, null))
+               .AddTextInput(new TextInputBuilder("Reminder", "reminder", TextInputStyle.Paragraph, "its a private field you can write anything.", 0, 500, false, null))
+               .AddTextInput(new TextInputBuilder("Description", "description", TextInputStyle.Short, "write something about this account.", 0, 50, false, null))
                .Build();
 
-            await RespondWithModalAsync(modal);
+            await Context.OverridenInteraction.RespondWithModalAsync(modal);
         }
         [ModalInteraction("accounts add", true)]
         public async Task add(AddAccountForm form)
@@ -159,9 +191,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 await FollowupAsync(Context.UserMention(), embed: this["wrong_coin"].ToDangerEmbed(this["unauthorized"]));
                 return;
             }
+
             int coins = value;
-            string id = form.Id.Trim().Remove("id:", "Id:", "ID:"); // don't use tolower
-            string nickname = form.Nickname.Trim();
+            string id = form.Id.Trim().Remove("id:", "Id:", "ID:", "iD:"); // don't use tolower
+            string nickname = form.Nickname.TrySubstring(16).Trim();
+            string reminder = form.Reminder?.TrySubstring(500, false) ?? "none";
+            string description = form.Description?.TrySubstring(50, false) ?? "none";
 
             if (id.Contains("discord"))
             {
@@ -206,6 +241,9 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 Id = id,
                 Nickname = nickname,
                 AddedAt = DateTime.UtcNow,
+                IsDefault = false,
+                Reminder = reminder,
+                Description = description
             };
             Context.BotUser.AddAccount(account);
 

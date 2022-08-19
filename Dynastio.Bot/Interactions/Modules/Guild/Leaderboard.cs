@@ -8,7 +8,7 @@ using Discord;
 using Dynastio.Net;
 using Dynastio.Data;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
@@ -19,7 +19,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public UserService UserService { get; set; }
         public DynastioClient Dynastio { get; set; }
 
-       
+
         [RateLimit(3)]
         [SlashCommand("score", "leaderboard score")]
         public async Task LeaderboardScore(LeaderboardType leaderboard = LeaderboardType.Monthly,

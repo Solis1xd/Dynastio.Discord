@@ -8,8 +8,9 @@ using Discord;
 using Dynastio.Net;
 
 using Discord.WebSocket;
+using Dynastio.Bot.Interactions.Modules.Shard;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
 
     [EnabledInDm(false)]
@@ -53,11 +54,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             var players1 = players.Skip((page - 1) * take).Take(take).ToList();
             var content = players1.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
                 a => players.IndexOf(a),
-                a => a.Parent.Label.RemoveString(16),
+                a => a.Parent.Label.TrySubstring(16),
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
-                a => a.Team.RemoveLines().RemoveString(10),
-                a => a.Nickname.RemoveLines().RemoveString(16)).ToMarkdown();
+                a => a.Team.RemoveLines().TrySubstring(10),
+                a => a.Nickname.RemoveLines().TrySubstring(16)).ToMarkdown();
 
             var map = Map == Map.Enable ? GraphicService.GetMap(players1) : null;
 

@@ -8,23 +8,52 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynastio.Data;
+using System.ComponentModel.DataAnnotations;
+using Dynastio.Bot.Interactions.Modules.Shard;
+using Newtonsoft.Json;
 
 namespace Dynastio.Bot.Interactions.Modules.Dynastio
 {
     [RequireUser(RequireUserAttribute.RequireUserType.BotOwner)]
     [RequireContext(ContextType.Guild)]
-    [EnabledInDm(false)]
+    [EnabledInDm(true)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
     [Group("developer", "bot developer commands")]
     public class DeveloperModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
+        
+        [Group("database", "database")]
+        [RequireDatabase]
+        public class DatabaseModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
+        {
+            public IDynastioBotDatabase db { get; set; }
+            [RequireConfirmation(
+                "Warning: sensitive information",
+                "Make sure this is a private channel, This information may be sensitive, Click the confirm button if you want to continue.")]
+            [SlashCommand("backup", "backup database")]
+            public async Task BackUpDatabase()
+            {
+                //await DeferAsync();
+              
+                var users = db.GetAllUsers();
+                var guilds = db.GetAllGuilds();
+
+                var dataUsers = JsonConvert.SerializeObject(users);
+                await DiscordStream.SendStringAsFile(Context.Channel, dataUsers, "users.json");
+
+                var dataGuilds = JsonConvert.SerializeObject(guilds);
+                await DiscordStream.SendStringAsFile(Context.Channel, dataGuilds, "guilds.json");
+
+                var msg = await FollowupAsync(embed: $"{users.Count} users and {guilds.Count} guilds uploaded.".ToSuccessfulEmbed("backup " + DateTime.UtcNow));
+            }
+        }
         [Group("youtube", "users commands")]
         public class YoutubeModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             public YoutubeService youtubeService { get; set; }
 
             [SlashCommand("videos", "send all youtube videos of a channel")]
-            public async Task sendAllYoutubeVideos(string channelId = "", YoutubeVideoOrderByType orderby = YoutubeVideoOrderByType.OrderByDescending, int take = 1, int skip = 0)
+            public async Task sendAllYoutubeVideos(string channelId = "", YoutubeVideoOrderByType orderby = YoutubeVideoOrderByType.OrderByNewest, int take = 1, int skip = 0)
             {
                 await DeferAsync();
 
@@ -38,7 +67,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     return;
                 }
 
-                videos = orderby == YoutubeVideoOrderByType.OrderBy
+                videos = orderby == YoutubeVideoOrderByType.OrderByOldest
                     ? videos.OrderBy(a => a.Snippet.PublishedAt).ToList()
                     : videos.OrderByDescending(a => a.Snippet.PublishedAt).ToList();
 
@@ -63,30 +92,72 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             }
             public enum YoutubeVideoOrderByType
             {
-                OrderBy,
-                OrderByDescending,
+                OrderByOldest,
+                OrderByNewest,
             }
         }
+        [Group("players", "players commands")]
+        public class playersModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
+        {
+            public UserService UserService { get; set; }
+            public DynastioClient Dynastio { get; set; }
 
+            [RateLimit(5, 2, RateLimit.RateLimitType.User)]
+            [SlashCommand("find", "find a discord user in the game")]
+            public async Task Find(
+            [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
+            [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player = "",
+             DynastioProviderType provider = DynastioProviderType.Main)
+            {
+                await DeferAsync(true);
+
+                var player_ = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => a.UniqeId == player);
+                if (player_ is null)
+                {
+                    await FollowupAsync(embed: "player not found".ToWarnEmbed("Not Found !"));
+                    return;
+                }
+                if (!player_.IsAuth)
+                {
+                    await FollowupAsync(embed: "the player is a guest".ToWarnEmbed("guest !"));
+                    return;
+                }
+                var team = Dynastio[provider].OnlinePlayers.GroupBy(a => a.Team).FirstOrDefault(a => a.Key == player_.Team && !string.IsNullOrEmpty(a.Key));
+
+                var teammates = team is null ? "`none`" : string.Join(", ", team.Select(a => a.Nickname));
+                string content =
+                    $"**Nickname:** {player_.Nickname.TrySubstring(18)}\n" +
+                    $"**Account Id:** {player_.Id ?? ""}\n" +
+                    $"**Level:** {player_.Level}\n" +
+                    $"**Score:** {player_.Score.Metric()}\n" +
+                    $"**Server:** {player_.Parent.Label.TrySubstring(20)}\n" +
+                    $"**Team:** {player_.Team}\n" +
+                    $"**Teammates:**: {teammates.ToMarkdown()}";
+
+                await FollowupAsync(embed: content.ToEmbed(player_.Nickname + "(Online Player)"));
+            }
+        }
 
         [Group("users", "users commands")]
         public class UsersModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
             public UserService userManager { get; set; }
 
+            [RequireConfirmation]
             [SlashCommand("clear-cache", "clear cached users")]
             public async Task clearCache()
             {
-                await DeferAsync();
+               // await DeferAsync();
                 var usersCount = userManager.GetCacheCount();
                 userManager.ClearCache();
                 await FollowupAsync(embed: $"{usersCount} users removed from the cache".ToEmbed());
             }
-
-            [SlashCommand("remove-account", "remove an account from the user")]
+           
+            [RequireConfirmation]
+            [SlashCommand("accounts-remove", "remove an account from the user")]
             public async Task removeAccount(IUser user, [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "")
             {
-                await DeferAsync();
+               // await DeferAsync();
                 var buser = await userManager.GetUserAsync(user.Id);
 
                 var selectedAccount = buser.GetAccount(int.Parse(account));
@@ -99,23 +170,35 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 await buser.UpdateAsync();
                 await FollowupAsync(embed: $"account removed from the user.".ToEmbed());
             }
-
+            [RequireConfirmation]
             [SlashCommand("permissions", "ban a user from the bot")]
-            public async Task userPermissiond(IUser user, UserBanType section, bool status = true)
+            public async Task userPermissiond(IUser user, UserBanType section, PermissionsType status)
             {
-                await DeferAsync();
+                //await DeferAsync();
                 var buser = await userManager.GetUserAsync(user.Id);
 
                 if (section == UserBanType.Bot)
-                    buser.IsBanned = status;
+                    buser.IsBanned = status == PermissionsType.Limited;
                 else
-                    buser.IsBannedToAddNewAccount = status;
+                    buser.IsBannedToAddNewAccount = status == PermissionsType.Limited;
 
                 await buser.UpdateAsync();
 
-                await FollowupAsync(embed: $"the {user.Id.ToUserMention()} permission to ` {section} ` is ` {(status ? "banned" : "available")} `.".ToEmbed());
+                await FollowupAsync(embed: $"the {user.Id.ToUserMention()} permission to ` {section} ` is ` {status} `.".ToEmbed());
             }
-            public enum UserBanType { Bot, AddAccount }
+            public enum UserBanType
+            {
+                Bot,
+                [Display(Name = "Add Account")]
+                AddAccount
+            }
+            public enum PermissionsType
+            {
+                Limited,
+                [Display(Name = "Not Limited")]
+                NotLimited
+            }
+
         }
 
     }

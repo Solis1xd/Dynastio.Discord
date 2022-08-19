@@ -1,6 +1,15 @@
-0.5.3 - 12/08/2022
+0.5.3 - 25/08/2022
+- "Reminder" & "Description" added for connected accounts.
+- command "/accounts edit" updated.
+- command "/accounts get" bug fixed.
+- command "/accounts get" changed to "/accounts details".
+- command "/accounts list" updated and it is better now.
+- command "/players chest" changed to "/player chest"
+- command "/players profile" changed to "/player profile"
+- command "/players find" changed to "/player find"
+- command "/servers" changed to "/server find"
 - fix RateLimi bug
-- remove "/user stat"
+- command "/user stat" removed
 
 0.5.2 - 09/08/2022
 - fixed bugs related to connected accounts

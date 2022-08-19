@@ -2,7 +2,7 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Dynastio.Bot;
+using Dynastio.Bot.Interactions;
 using Dynastio.Data;
 using Dynastio.Net;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,13 +43,14 @@ namespace Dynastio.Bot
             var graphicService = new GraphicService().Initialize();
 
             IDynastioBotDatabase db =
-                !configuration.DatabaseConnectionString.IsNullOrEmpty()
+                configuration.DatabaseConnectionString.IsNullOrEmpty()
                 ? new NoDatabaseDb()
-                
+
                 : configuration.DatabaseConnectionString.Contains("mongodb")
                 ? new MongoDb(configuration.DatabaseConnectionString)
-                
-                : new NoDatabaseDb();
+
+                :
+                new NoDatabaseDb();
 
             db = await db.InitializeAsync();
 
@@ -99,7 +100,7 @@ namespace Dynastio.Bot
             AlwaysDownloadUsers = true,
             AlwaysDownloadDefaultStickers = false,
             DefaultRetryMode = RetryMode.AlwaysRetry,
-
+            
         };
         public async Task RunAsync(IServiceProvider _services)
         {
@@ -137,6 +138,5 @@ namespace Dynastio.Bot
                 return false;
 #endif
         }
-
     }
 }

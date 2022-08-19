@@ -12,13 +12,14 @@ namespace Dynastio.Data
 
         //Guilds
         Task<List<Guild>> GetGuildsByMessageOnlyChannelsAsync();
+        List<Guild> GetAllGuilds();
         Task<Guild> GetGuildAsync(ulong Id);
         Task<bool> InsertAsync(Guild guild);
         Task<bool> UpdateAsync(Guild guild);
 
         //Users
         Task<List<User>> Get10TopHonor(int count = 10);
-        List<User> GetAll();
+        List<User> GetAllUsers();
         Task<User> GetUserAsync(ulong Id);
         Task<User> GetUserByAccountIdAsync(string Id);
         Task<bool> InsertAsync(User Buser);

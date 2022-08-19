@@ -8,8 +8,9 @@ using Discord;
 using Dynastio.Net;
 
 using Discord.WebSocket;
+using Dynastio.Bot.Interactions.Modules.Shard;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
 
     [EnabledInDm(false)]
@@ -22,98 +23,6 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         public GraphicService GraphicService { get; set; }
         public DynastioClient Dynastio { get; set; }
         public UserService UserService { get; set; }
-
-        [RateLimit(120, 4)]
-        [SlashCommand("profile", "online player profile")]
-        public async Task profile(
-            [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
-            [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player = "",
-             DynastioProviderType provider = DynastioProviderType.Main)
-        {
-            await DeferAsync();
-            var player_ = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => a.UniqeId == player);
-            if (player_ is null)
-            {
-                await FollowupAsync(embed: "player not found".ToWarnEmbed("Not Found !"));
-                return;
-            }
-            if (!player_.IsAuth)
-            {
-                await FollowupAsync(embed: "the player is a guest".ToWarnEmbed("guest !"));
-                return;
-            }
-            var profile = await Dynastio[provider].GetUserProfileAsync(player_.Id).TryGet();
-            if (profile == null)
-            {
-                await FollowupAsync("chest not found, join the game and put something to your chest.");
-                return;
-            }
-            var image = GraphicService.GetProfile(profile);
-            await FollowupWithFileAsync(image, "profile.jpeg", $"Online player profile ({player_.Nickname})");
-        }
-        [RateLimit(120, 4)]
-        [SlashCommand("chest", "online player chest")]
-        public async Task chest(
-            [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
-            [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePlayersAutocompleteHandler))] string player = "",
-             DynastioProviderType provider = DynastioProviderType.Main)
-        {
-            await DeferAsync();
-            var player_ = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => a.UniqeId == player);
-            if (player_ is null)
-            {
-                await FollowupAsync(embed: "player not found".ToWarnEmbed("Not Found !"));
-                return;
-            }
-            if (!player_.IsAuth)
-            {
-                await FollowupAsync(embed: "the player is a guest".ToWarnEmbed("guest !"));
-                return;
-            }
-            var chest = await Dynastio[provider].GetUserPersonalchestAsync(player_.Id).TryGet();
-            if (chest == null)
-            {
-                await FollowupAsync("chest not found, join the game and put something to your chest.");
-                return;
-            }
-            var image = GraphicService.GetPersonalChest(chest);
-            await FollowupWithFileAsync(image, "chest.jpeg", $"Online player chest ({player_.Nickname})");
-        }
-
-        [RateLimit(10, 2, RateLimit.RateLimitType.User)]
-        [SlashCommand("find", "find discord user")]
-        public async Task Find(IUser user,
-            DynastioProviderType provider = DynastioProviderType.Main)
-        {
-            await DeferAsync();
-            var botUser = await UserService.GetUserAsync(user.Id, false);
-            if (botUser is null || botUser.Accounts == null || botUser.Accounts.Count == 0)
-            {
-                await FollowupAsync(embed: "No any account of this user found.".ToWarnEmbed("Not Found !"));
-                return;
-            }
-            var accounts = botUser.Accounts.Select(a => a.Id).ToList();
-
-            var result = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => accounts.Contains(a.Id));
-            if (result == null)
-            {
-                await FollowupAsync(embed: "No any online account of this user found.".ToWarnEmbed($"{user.Username} is offline !"));
-                return;
-            }
-
-            var team = Dynastio[provider].OnlinePlayers.GroupBy(a => a.Team).FirstOrDefault(a => a.Key == result.Team && !string.IsNullOrEmpty(a.Key));
-
-            var teammates = team is null ? "`none`" : string.Join(", ", team.Select(a => a.Nickname));
-            string content =
-                $"**Nickname:** {result.Nickname.RemoveString(18)}\n" +
-                $"**Level:** {result.Level}\n" +
-                $"**Score:** {result.Score.Metric()}\n" +
-                $"**Server:** {result.Parent.Label.RemoveString(20)}\n" +
-                $"**Team:** {result.Team}\n" +
-                $"**Teammates:**: {teammates.ToMarkdown()}";
-
-            await FollowupAsync(embed: content.ToEmbed(user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
-        }
 
         [RateLimit(10, 1, RateLimit.RateLimitType.User)]
         [SlashCommand("discord", "search for a list of discord players")]
@@ -139,11 +48,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 
             var content = players.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
                 a => players.IndexOf(a) + skip,
-                a => a.Parent.Label.RemoveString(16),
+                a => a.Parent.Label.TrySubstring(16),
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
-                a => a.Team.RemoveLines().RemoveString(10),
-                a => a.Nickname.RemoveLines().RemoveString(16)).ToMarkdown();
+                a => a.Team.RemoveLines().TrySubstring(10),
+                a => a.Nickname.RemoveLines().TrySubstring(16)).ToMarkdown();
 
             string content1 = string.Join("\n", players.Select(a => $"**{players.IndexOf(a).ToRegularCounter()}** <@{a.Id.Remove("discord:")}>"));
 
@@ -217,11 +126,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             var players1 = players.Skip((page - 1) * take).Take(take).ToList();
             var content = players1.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
                 a => players.IndexOf(a),
-                a => a.Parent.Label.RemoveString(16),
+                a => a.Parent.Label.TrySubstring(16),
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
-                a => a.Team.RemoveLines().RemoveString(10),
-                a => a.Nickname.RemoveLines().RemoveString(16)).ToMarkdown();
+                a => a.Team.RemoveLines().TrySubstring(10),
+                a => a.Nickname.RemoveLines().TrySubstring(16)).ToMarkdown();
 
             string content1 = this["total_servers:*", dyanstioProvider.OnlineServers.Count] + " | " +
                               this["total_players:*", dyanstioProvider.OnlinePlayers.Count] + "\n" +

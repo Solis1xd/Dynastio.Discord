@@ -21,6 +21,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
     [DefaultMemberPermissions(GuildPermission.Administrator)]
     public class Guild : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
+        [RequireDatabase]
         [Group("setting", "server setting")]
         [RateLimit(30, 3, RateLimit.RateLimitType.Guild)]
         public class GuildSettings : CustomInteractionModuleBase<CustomSocketInteractionContext>

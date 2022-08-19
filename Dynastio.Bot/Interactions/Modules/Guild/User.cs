@@ -8,7 +8,9 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 using Dynastio.Data;
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+using Dynastio.Bot.Interactions.Modules.Shard;
+
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
 
     [EnabledInDm(false)]
@@ -24,7 +26,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [RateLimit(70, 4, RateLimit.RateLimitType.User)]
         [SlashCommand("profile", "your dynastio profile")]
         public async Task profile(
-            IGuildUser user ,
+            IGuildUser user,
             [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
                 DynastioProviderType provider = DynastioProviderType.Main)
         {
@@ -33,12 +35,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             var dynastioProvider = Dynastio[provider];
 
             UserAccount selectedAccount;
-           
-                var botUser = await UserService.GetUserAsync(user.Id);
-                selectedAccount = string.IsNullOrWhiteSpace(account)
-                ? botUser.GetAccount()
-                : botUser.GetAccount(int.Parse(account));
-         
+
+            var botUser = await UserService.GetUserAsync(user.Id);
+            selectedAccount = string.IsNullOrWhiteSpace(account)
+            ? botUser.GetAccount()
+            : botUser.GetAccount(int.Parse(account));
+
 
             var profile = await dynastioProvider.GetUserProfileAsync(selectedAccount.Id).TryGet();
             if (profile == null)
@@ -54,7 +56,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 
             var image = GraphicService.GetProfile(profile);
 
-            await FollowupWithFileAsync(image, "profile.jpeg");
+            await FollowupWithFileAsync(image, "profile.jpeg", $"Discord User Profile {user.Nickname} `{user.Username}` Account: `{selectedAccount.Nickname}`");
         }
         [RateLimit(70, 3, RateLimit.RateLimitType.User)]
         [SlashCommand("chest", "your dynastio chest")]
@@ -66,14 +68,14 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
 
-           
+
 
             var dynastioProvider = Dynastio[provider];
 
             if (All)
             {
                 var botUser = await UserService.GetUserAsync(user.Id, false);
-                if(botUser == null)
+                if (botUser == null)
                 {
                     await FollowupAsync("user not found.");
                     return;
@@ -85,18 +87,18 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     return;
                 }
                 var image = GraphicService.GetPersonalChests(chests.ToArray());
-                await FollowupWithFileAsync(image, "chest.jpeg");
+                await FollowupWithFileAsync(image, "chest.jpeg", $"Discord User Profile {user.Nickname} `{user.Username}` Account: All Accounts");
             }
             else
             {
                 UserAccount selectedAccount;
-              
-                    var botUser = await UserService.GetUserAsync(user.Id);
 
-                    selectedAccount = string.IsNullOrWhiteSpace(account)
-                    ? botUser.GetAccount()
-                    : botUser.GetAccount(int.Parse(account));
-               
+                var botUser = await UserService.GetUserAsync(user.Id);
+
+                selectedAccount = string.IsNullOrWhiteSpace(account)
+                ? botUser.GetAccount()
+                : botUser.GetAccount(int.Parse(account));
+
 
                 if (selectedAccount == null)
                 {
@@ -112,7 +114,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 }
                 var image = GraphicService.GetPersonalChest(chest);
 
-                await FollowupWithFileAsync(image, "chest.jpeg");
+                await FollowupWithFileAsync(image, "chest.jpeg", $"Discord User Profile {user.Nickname} `{user.Username}` Account: `{selectedAccount.Nickname}`");
             }
 
         }

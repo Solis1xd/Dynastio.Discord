@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Dynastio.Bot.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -43,7 +43,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
                 await FollowupAsync(embed: "Can not set more than 6 hours".ToWarnEmbed("Discord Error"));
             }
         }
-
+        [RequireDatabase]
         [Group("image-only", "image only channels")]
         public class ImageOnlyModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {

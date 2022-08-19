@@ -30,7 +30,7 @@ namespace Dynastio.Bot
             return Regex.Replace(Value, "\\t|\\n|\\r|\\r\\n|\\n\\r|", "");
         }
 
-        public static string RemoveString(this string value, int maxLength, bool dots = true)
+        public static string TrySubstring(this string value, int maxLength, bool dots = true)
         {
             if (value.Length > maxLength)
             {

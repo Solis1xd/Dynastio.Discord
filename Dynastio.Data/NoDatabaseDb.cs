@@ -33,6 +33,7 @@ namespace Dynastio.Data
                 Id = Id
             });
         }
+        public List<Guild> GetAllGuilds() => new();
         public Task<List<Guild>> GetGuildsByMessageOnlyChannelsAsync()
         {
             return Task.FromResult(new List<Guild>());
@@ -45,7 +46,7 @@ namespace Dynastio.Data
         {
             return Task.FromResult(new List<User>());
         }
-        public List<User> GetAll()
+        public List<User> GetAllUsers()
         {
             return new List<User>();
         }

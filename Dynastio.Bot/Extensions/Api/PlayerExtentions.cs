@@ -19,7 +19,7 @@ namespace Dynastio.Bot
             {
                 var o = new SelectMenuOptionBuilder()
                     .WithValue(player.UniqeId)
-                    .WithLabel((Players.IndexOf(player) + Index).ToRegularCounter() + ". " + StringExtensions.RemoveString(player.Nickname.RemoveLines(), 16))
+                    .WithLabel((Players.IndexOf(player) + Index).ToRegularCounter() + ". " + StringExtensions.TrySubstring(player.Nickname.RemoveLines(), 16))
                     .WithDescription(player.IsAuth ? (player.IsDiscordAuth() ? "Discord Player" : "Google or Facebook Player") : "Guest")
                     .WithEmote(player.IsAuth ? new Emoji("🔸") : new Emoji("🔹"));
                 options.Add(o);

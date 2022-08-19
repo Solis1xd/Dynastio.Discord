@@ -10,11 +10,11 @@ using System;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions
+namespace Dynastio.Bot.Interactions.Modules.Shard
 {
     public class SharedModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
-        
+
         [ComponentInteraction("shared.close")]
         public async Task close()
         {

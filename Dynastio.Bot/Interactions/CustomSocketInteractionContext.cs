@@ -2,8 +2,10 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Dynastio.Bot;
 using Dynastio.Data;
 using Dynastio.Net;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -11,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynastio.Bot
+namespace Discord.Interactions
 {
 
     //
@@ -30,7 +32,7 @@ namespace Dynastio.Bot
         //   interaction:
         //     The underlying interaction
         public CustomSocketInteractionContext(DiscordSocketClient client, SocketInteraction interaction, User user, Locale Locale, Guild BotGuild)
-            : base(client, interaction, user, Locale,BotGuild)
+            : base(client, interaction, user, Locale, BotGuild)
         {
         }
     }
@@ -42,6 +44,7 @@ namespace Dynastio.Bot
         Guild BotGuild { get; }
         User BotUser { get; }
         Locale Locale { get; }
+        SocketInteraction OverridenInteraction { get; set; }
     }
     //
     // Summary:
@@ -56,7 +59,7 @@ namespace Dynastio.Bot
         //     Gets the Discord.WebSocket.DiscordSocketClient that the command will be executed
         //     with.
         public DiscordSocketClient Client { get; }
-
+        public SocketInteraction OverridenInteraction { get; set; }
         //
         // Summary:
         //     Gets the Discord.WebSocket.SocketGuild the command originated from.

@@ -27,5 +27,9 @@
 	  <ProjectReference Include="..\Dynastio.Data\Dynastio.Data.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Interactions\Modules\Guild\Default Permissions\" />
+	</ItemGroup>
+
 
 </Project>

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord;
-using Dynastio.Bot;
+using Dynastio.Bot.Interactions;
 
 namespace Discord.Interactions
 {

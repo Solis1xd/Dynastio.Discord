@@ -8,7 +8,7 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.EmbedLinks)]
@@ -27,7 +27,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             {
                 await DeferAsync();
                 var result = Youtube.Videos.FirstOrDefault(a => a.Id.VideoId == video);
-                if(result == null)
+                if (result == null)
                 {
                     await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
                     return;
@@ -52,7 +52,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 {
                     results.Add(new AutocompleteResult()
                     {
-                        Name = StringExtensions.RemoveString(video.Snippet.Title, 90),
+                        Name = video.Snippet.Title.TrySubstring(90),
                         Value = video.Id.VideoId
                     });
                 }

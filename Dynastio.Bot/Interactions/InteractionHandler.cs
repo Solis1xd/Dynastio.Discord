@@ -5,12 +5,12 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Dynastio.Bot;
 using Dynastio.Bot.Extensions;
 using Newtonsoft.Json;
 using Dynastio.Net;
 using Dynastio.Data;
-namespace Dynastio.Bot
+
+namespace Dynastio.Bot.Interactions
 {
     public class InteractionHandler
     {
@@ -78,7 +78,12 @@ namespace Dynastio.Bot
             if (!InteractionUtilities.IsStaticInteractionCommand(interaction)) return;
 
             var user = await userService.GetUserAsync(interaction.User.Id);
-            if (user.IsBanned) return;
+            
+            if (user.IsBanned)
+            {
+                await interaction.RespondAsync(ephemeral: true, embed: "Unfortunately, your access to the bot is **limited**, you cannot use the bot.".ToDangerEmbed());
+                return;
+            }
 
             var locale = localeService[interaction.UserLocale];
             var guild = await _guildservice.GetGuildAsync(interaction.GuildId.Value);
@@ -101,8 +106,10 @@ namespace Dynastio.Bot
                           $"\nName: {commandInfo.Name}" +
                           $"\nMethodName: {commandInfo.MethodName}" +
                           $"\nUser: {context_.User.Id}";
+
             var channel = _client.GetGuild(_configuration.Guilds.MainServer)
                 .GetTextChannel(_configuration.Channels.ErrorLoggerChannel);
+
             await DiscordStream.SendStringAsFile(channel, content);
         }
         private async Task _handler_InteractionExecuted(ICommandInfo commandInfo, IInteractionContext context_, IResult result)

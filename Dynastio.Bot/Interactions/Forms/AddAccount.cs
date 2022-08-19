@@ -27,6 +27,14 @@ namespace Dynastio.Bot
         [ModalTextInput("id", TextInputStyle.Short, "google:0000000000000000000", 0, maxLength: 150, null)]
         public string Id { get; set; }
 
+        [InputLabel("Reminder")]
+        [RequiredInput(true)]
+        [ModalTextInput("reminder", TextInputStyle.Paragraph, "its a private field you can write anything.", 0, maxLength: 500,null)]
+        public string Reminder { get; set; }
 
+        [InputLabel("Description")]
+        [RequiredInput(false)]
+        [ModalTextInput("description", TextInputStyle.Short, "write something about this account.", 0, maxLength: 50, null)]
+        public string Description { get; set; }
     }
 }

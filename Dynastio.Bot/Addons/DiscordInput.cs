@@ -12,15 +12,7 @@ namespace Dynastio.Bot
 {
     public static class DiscordInput
     {
-        public static async Task<UserAccount> ReadSelectMenuUserAccountAsync(this IInteractionContext Context, User user, IUserMessage Message = null, Action<SocketInteraction> action = null)
-        {
-            var res = await ReadSelectMenuUserAccountsAsync(Context, user, 1, 1, Message, action);
-            return res?.FirstOrDefault() ?? null;
-        }
-        public static async Task<List<UserAccount>> ReadSelectMenuUserAccountsAsync(this IInteractionContext Context, User user, int min = 1, int max = 1, IUserMessage Message = null, Action<SocketInteraction> action = null)
-        {
-            return await SelectMenuUtilities.GetUserAccounts(Context, user, min, max, Message, action);
-        }
+
 
         public static async Task<SocketMessage> ReadContextMessageAsync(this ICommandContext Context, TimeSpan Timeout, bool OnlyCurrentUser = true, bool OnlyCurrentChannel = true, bool OnlyCurrentGuild = true)
         => await ReadMessageAsync(Context.Client as DiscordSocketClient, (OnlyCurrentGuild ? Context.Guild.Id : 0), (OnlyCurrentChannel ? Context.Channel.Id : 0), (OnlyCurrentUser ? Context.User.Id : 0), Timeout);

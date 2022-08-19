@@ -8,19 +8,21 @@ using Discord;
 using Dynastio.Net;
 
 using Discord.WebSocket;
+using Dynastio.Bot.Interactions.Modules.Shard;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.AttachFiles)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
+    [Group("server", "dyanstio server")]
     public class ServerModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public DynastioClient Dynastio { get; set; }
 
         [RateLimit(10, 2, RateLimit.RateLimitType.User)]
-        [SlashCommand("server", "get server information")]
+        [SlashCommand("find", "get server information")]
         public async Task server(
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
             [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,
@@ -37,7 +39,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             var teams = result.Players.GroupBy(a => a.Team);
 
             var content =
-                $"**Label**: {result.Label.RemoveString(20)}\n" +
+                $"**Label**: {result.Label.TrySubstring(20)}\n" +
                 $"**Region**: {result.Region}\n" +
                 $"**TopPlayerName** {result.TopPlayerName}\n" +
                 $"**TopPlayerLevel**: {result.TopPlayerLevel}\n" +
@@ -56,7 +58,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 $"**ServerTime**: {result.ServerTime}\n" +
                 $"**Version**: {result.Version}\n" +
                 $"**PlayersCount**: {result.PlayersCount}\n" +
-                $"**Players**: {string.Join(", ", result.Players.Select(a => a.Nickname.RemoveString(16))).ToMarkdown()}" +
+                $"**Players**: {string.Join(", ", result.Players.Select(a => a.Nickname.TrySubstring(16))).ToMarkdown()}" +
                 $"**Teams**: {string.Join(", ", teams.Select(a => a.Key)).ToMarkdown()}" +
                 $"";
 

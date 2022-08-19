@@ -9,7 +9,7 @@ using Discord.Interactions.Builders;
 using Discord.Rest;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot
+namespace Dynastio.Bot.Interactions
 {
     //
     // Summary:
@@ -50,7 +50,7 @@ namespace Dynastio.Bot
         }
         public async Task<bool> ModifyToClosed(IUserMessage message = null)
         {
-            await (message ?? (message ?? (Context.Interaction as SocketMessageComponent).Message)).ModifyAsync(x =>
+            await (message ?? message ?? (Context.Interaction as SocketMessageComponent).Message).ModifyAsync(x =>
             {
                 x.Content = (message ?? (Context.Interaction as SocketMessageComponent).Message).MentionedUserIds.FirstOrDefault().ToUserMention();
                 x.Embed = new EmbedBuilder()
@@ -173,7 +173,7 @@ namespace Dynastio.Bot
         {
             return DiscordStream.FollowupWithFileAsync(Context, image, fileName, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
         }
-       
+
         protected virtual Task RespondWithFileAsync(string filePath, string fileName = null, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
         {
             return Context.Interaction.RespondWithFileAsync(filePath, fileName, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);

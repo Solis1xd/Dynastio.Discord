@@ -45,7 +45,6 @@ namespace Dynastio.Bot
             }
         }
 
-
         private async Task _client_LeftGuild(SocketGuild guild)
         {
             if (_configuration.Guilds.MainServer == 0 || _configuration.Channels.JoinLeftLoggerChannel == 0)

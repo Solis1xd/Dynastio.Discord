@@ -9,8 +9,9 @@ using Dynastio.Net;
 using Discord.WebSocket;
 using Dynastio.Data;
 using SixLabors.ImageSharp;
+using Dynastio.Bot.Interactions.Modules.Shard;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [RequireUserDynastioAccount]
     [EnabledInDm(false)]

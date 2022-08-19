@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynastio.Data;
+using Dynastio.Bot.Interactions;
 
-namespace Dynastio.Bot
+namespace Dynastio.Bot.Interactions.Modules.Shard
 {
     public class SharedAutocompleteHandler
     {
@@ -23,12 +24,12 @@ namespace Dynastio.Bot
                 var all = autocompleteInteraction.Data.Options.Where(a => a.Name == "all").FirstOrDefault();
                 var userParam = autocompleteInteraction.Data.Options.Where(a => a.Name == "user").FirstOrDefault();
 
-                User user = (userParam == null || string.IsNullOrEmpty((string)userParam.Value))
+                User user = userParam == null || string.IsNullOrEmpty((string)userParam.Value)
                     ? (context as ICustomInteractionContext).BotUser
                     : await UserService.GetUserAsync(ulong.Parse((string)userParam.Value));
 
 
-                results = (all == null || (bool)all.Value == false)
+                results = all == null || (bool)all.Value == false
                  ? AutocompleteUtilities.Parse(user.Accounts.Where(a => a.Nickname.Contains(match)).ToList())
                  : new List<AutocompleteResult>() { new AutocompleteResult() { Name = "All", Value = "0" } };
 
@@ -61,8 +62,8 @@ namespace Dynastio.Bot
                 {
                     results.Add(new AutocompleteResult()
                     {
-                        Name = StringExtensions.RemoveString(server.Label, 98),
-                        Value = server.Label.RemoveString(30, false)
+                        Name = server.Label.TrySubstring(98),
+                        Value = server.Label.TrySubstring(30, false)
                     });
                 }
                 // max - 25 suggestions at a time (API limit)
@@ -92,7 +93,7 @@ namespace Dynastio.Bot
                 {
                     results.Add(new AutocompleteResult()
                     {
-                        Name = StringExtensions.RemoveString(player.Nickname, 16),
+                        Name = player.Nickname.TrySubstring(16),
                         Value = player.UniqeId
                     });
                 }

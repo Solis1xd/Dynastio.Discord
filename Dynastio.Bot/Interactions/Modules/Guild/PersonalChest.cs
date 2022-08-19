@@ -8,7 +8,9 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 using Dynastio.Data;
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+using Dynastio.Bot.Interactions.Modules.Shard;
+
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.AttachFiles)]
     [EnabledInDm(false)]
@@ -23,8 +25,9 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [RequireUserDynastioAccount]
         [SlashCommand("chest", "your private chest")]
         public async Task personalChest(
-            bool All = false,
-            bool CountItems = false,
+            bool all = false,
+            bool countItems = false,
+            ChestStyleType style = ChestStyleType.Default,
             [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
             DynastioProviderType provider = DynastioProviderType.Main
             )
@@ -32,7 +35,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             await DeferAsync();
             var dynastioProvider = Dynastio[provider];
 
-            if (All && Context.BotUser.Accounts.Count > 1)
+            if (all && Context.BotUser.Accounts.Count > 1)
             {
                 var chests = await Context.BotUser.Accounts.GetPersonalchests(dynastioProvider);
                 if (chests == null || chests.Count == 0)
@@ -44,7 +47,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
 
                 string content = "";
 
-                if (CountItems)
+                if (countItems)
                 {
                     Dictionary<string, int> items = new();
                     foreach (var chest in chests)
@@ -62,12 +65,17 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                             }
                         }
                     }
-                    content = items.OrderByDescending(a=>a.Value).ToStringTable(new string[] { "Item", "Count" },
+
+                    content = items.OrderByDescending(a => a.Value).ToStringTable(new string[] { "Item", "Count" },
                         a => a.Key,
                         a => "x" + a.Value);
+
+                    await FollowupWithFileAsync(image, "chest.jpeg", embed: content.ToMarkdown().ToEmbed(imageUrl: "attachment://chest.jpeg"));
+                    return;
                 }
 
-                await FollowupWithFileAsync(image, "chest.jpeg", embed: content.ToMarkdown().ToEmbed(imageUrl: "attachment://chest.jpeg"));
+                await FollowupWithFileAsync(image, "chest.jpeg");
+                return;
             }
             else
             {
@@ -86,7 +94,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     await FollowupAsync("chest not found, join the game and put something to your chest.");
                     return;
                 }
-                var image = GraphicService.GetPersonalChest(chest);
+                var image = GraphicService.GetPersonalChest(chest, style);
 
                 await FollowupWithFileAsync(image, "chest.jpeg");
             }

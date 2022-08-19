@@ -39,6 +39,7 @@ namespace Dynastio.Data
             {
                 Console.WriteLine("Mongodb Not Connected");
                 this.Dispose();
+
                 return new NoDatabaseDb();
             }
         }
@@ -46,11 +47,14 @@ namespace Dynastio.Data
         private IMongoDatabase _dynastio;
         private IMongoCollection<User> _users => _dynastio.GetCollection<User>("Users");
         private IMongoCollection<Guild> _guilds => _dynastio.GetCollection<Guild>("Guilds");
+
+
         public async Task<List<Guild>> GetGuildsByMessageOnlyChannelsAsync()
         {
             var result = _guilds.Find(a => a.OnlyImageChannels.Count > 0).ToList();
             return await Task.FromResult(result);
         }
+        public List<Guild> GetAllGuilds() => _guilds.Find<Guild>(_ => true).ToList();
         public async Task<Guild> GetGuildAsync(ulong Id)
         {
             var result = _guilds.Find(a => a.Id == Id).FirstOrDefault();
@@ -78,7 +82,7 @@ namespace Dynastio.Data
             });
             return result.ToList();
         }
-        public List<User> GetAll() => _users.Find<User>(_ => true).ToList();
+        public List<User> GetAllUsers() => _users.Find<User>(_ => true).ToList();
         public async Task<User> GetUserAsync(ulong Id)
         {
             var result = _users.Find(a => a.Id == Id).FirstOrDefault();
@@ -137,5 +141,7 @@ namespace Dynastio.Data
         {
             this._db = null;
         }
+
+       
     }
 }

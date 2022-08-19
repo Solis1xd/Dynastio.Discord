@@ -8,13 +8,13 @@ using Discord;
 using Dynastio.Net;
 using Discord.WebSocket;
 
-namespace Dynastio.Bot.Interactions.Modules.Dynastio
+namespace Dynastio.Bot.Interactions.Modules.Guild
 {
 
     [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    [RateLimit(60, 1, RateLimit.RateLimitType.User)]
+    [RateLimit(60, 2, RateLimit.RateLimitType.User)]
     public class Version : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public DynastioClient Dynastio { get; set; }
@@ -24,7 +24,11 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         {
             await DeferAsync();
             var version = await Dynastio[provider].GetCurrentVersionAsync();
-            var message = await FollowupAsync(embed: $"Dynastio Current Version {provider} Is **{version.CurrentVersion}** (Download)[{version.DownloadUrl}]".ToEmbed("Dynastio Version"));
+            var message = await FollowupAsync(
+                embed: (
+                $"Dynastio Current Version {provider} Is **{version.CurrentVersion}**" +
+                $"\n[Download]({version.DownloadUrl})"
+                ).ToEmbed("Dynastio Version"));
         }
     }
 }
