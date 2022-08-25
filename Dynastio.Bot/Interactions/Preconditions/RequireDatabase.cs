@@ -21,7 +21,7 @@ namespace Discord.Interactions
         public new string ErrorMessage = $"This command require database.";
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
-            var db = services.GetRequiredService<Dynastio.Data.IDynastioBotDatabase>();
+            var db = services.GetRequiredService<Dynastio.Data.IDatabase>();
             if (db is NoDatabaseDb)
                 return Task.FromResult(PreconditionResult.FromError(this.ErrorMessage));
             else

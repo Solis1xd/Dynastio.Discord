@@ -26,7 +26,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
         [RequireDatabase]
         public class DatabaseModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
-            public IDynastioBotDatabase db { get; set; }
+            public IDatabase db { get; set; }
             [RequireConfirmation(
                 "Warning: sensitive information",
                 "Make sure this is a private channel, This information may be sensitive, Click the confirm button if you want to continue.")]

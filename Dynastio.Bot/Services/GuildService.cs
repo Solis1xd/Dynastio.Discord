@@ -11,8 +11,8 @@ namespace Dynastio.Bot
     public class GuildService
     {
         private readonly ConcurrentBag<Guild> guilds;
-        private readonly IDynastioBotDatabase db;
-        public GuildService(IDynastioBotDatabase mongo)
+        private readonly IDatabase db;
+        public GuildService(IDatabase mongo)
         {
             Program.Log("GuildService", "StartAsync");
 

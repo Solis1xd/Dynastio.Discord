@@ -42,7 +42,7 @@ namespace Dynastio.Bot
 
             var graphicService = new GraphicService().Initialize();
 
-            IDynastioBotDatabase db =
+            IDatabase db =
                 configuration.DatabaseConnectionString.IsNullOrEmpty()
                 ? new NoDatabaseDb()
 
@@ -77,7 +77,7 @@ namespace Dynastio.Bot
             var services = new ServiceCollection()
                 .AddSingleton(configuration)
                 .AddSingleton(dynastClient)
-                .AddSingleton((IDynastioBotDatabase)db)
+                .AddSingleton((IDatabase)db)
                 .AddSingleton(userService)
                 .AddSingleton(guildService)
                 .AddSingleton(graphicService)

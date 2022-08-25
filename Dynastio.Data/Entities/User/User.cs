@@ -12,10 +12,10 @@ namespace Dynastio.Data
     [BsonIgnoreExtraElements]
     public class User
     {
-        private readonly IDynastioBotDatabase db;
+        private readonly IDatabase db;
         public User() { }
 
-        public User(IDynastioBotDatabase db)
+        public User(IDatabase db)
         {
             this.db = db;
         }

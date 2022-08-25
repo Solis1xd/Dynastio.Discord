@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dynastio.Data
 {
-    public interface IDynastioBotDatabase
+    public interface IDatabase
     {
-        Task<IDynastioBotDatabase> InitializeAsync();
+        Task<IDatabase> InitializeAsync();
 
         //Guilds
         Task<List<Guild>> GetGuildsByMessageOnlyChannelsAsync();

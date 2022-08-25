@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Dynastio.Data
 {
-    public class NoDatabaseDb : IDynastioBotDatabase
+    public class NoDatabaseDb : IDatabase
     {
         public NoDatabaseDb()
         {
             Program.Log("NoDatabaseDb", "No Database");
         }
 
-        public Task<IDynastioBotDatabase> InitializeAsync()
+        public Task<IDatabase> InitializeAsync()
         {
-            return Task.FromResult((IDynastioBotDatabase)this);
+            return Task.FromResult((IDatabase)this);
         }
 
         public Task<bool> UpdateAsync(Guild guild)

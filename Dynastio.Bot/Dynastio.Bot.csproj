@@ -27,5 +27,21 @@
 	  <ProjectReference Include="..\Dynastio.Data\Dynastio.Data.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Remove="..\.dockerignore" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="..\.dockerignore" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="..\.dockerignore" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="..\.dockerignore" />
+	</ItemGroup>
+
 
 </Project>

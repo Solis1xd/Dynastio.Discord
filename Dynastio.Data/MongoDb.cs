@@ -12,7 +12,7 @@ using System.Timers;
 
 namespace Dynastio.Data
 {
-    public class MongoDb : IDynastioBotDatabase, IDisposable
+    public class MongoDb : IDatabase, IDisposable
     {
         private MongoClient _db { get; set; }
         public MongoDb(string mongoConnection)
@@ -24,7 +24,7 @@ namespace Dynastio.Data
 
             Program.Log("Mongodb", "Initialized");
         }
-        public async Task<IDynastioBotDatabase> InitializeAsync()
+        public async Task<IDatabase> InitializeAsync()
         {
             try
             {

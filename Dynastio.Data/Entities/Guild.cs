@@ -11,10 +11,10 @@ namespace Dynastio.Data
     [BsonIgnoreExtraElements]
     public class Guild
     {
-        private readonly IDynastioBotDatabase db;
+        private readonly IDatabase db;
         public Guild() { }
 
-        public Guild(IDynastioBotDatabase db)
+        public Guild(IDatabase db)
         {
             this.db = db;
         }
