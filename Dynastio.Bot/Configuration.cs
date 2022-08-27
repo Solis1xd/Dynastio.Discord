@@ -29,6 +29,7 @@ namespace Dynastio.Bot
                 return configuration;
             }
 
+
             string path = Environment.GetEnvironmentVariable("path");
             if (!string.IsNullOrEmpty(path))
                 return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(path));
@@ -36,6 +37,9 @@ namespace Dynastio.Bot
             string config = Environment.GetEnvironmentVariable("config");
             if (!string.IsNullOrEmpty(config))
                 return JsonConvert.DeserializeObject<Configuration>(config);
+
+            var configuration_ = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(@"config.json"));
+            return configuration_;
 
             string key = Environment.GetEnvironmentVariable("key");
             string encryptedvalue = Environment.GetEnvironmentVariable("encryptedvalue");

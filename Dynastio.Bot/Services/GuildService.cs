@@ -27,7 +27,7 @@ namespace Dynastio.Bot
                 guild = await db.GetGuildAsync(id);
                 if (guild == null || guild == default)
                 {
-                    guild = new Guild(db)
+                    guild = new Guild()
                     {
                         Id = id,
                     };

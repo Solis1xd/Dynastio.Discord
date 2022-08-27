@@ -124,7 +124,7 @@ namespace Dynastio.Bot
                 }
                 catch { }
 
-                if (updateGuild) await g.UpdateAsync();
+                if (updateGuild) await _db.UpdateAsync(g);
             }
 
         }

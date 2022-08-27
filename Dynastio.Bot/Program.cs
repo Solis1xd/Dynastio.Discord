@@ -42,15 +42,11 @@ namespace Dynastio.Bot
 
             var graphicService = new GraphicService().Initialize();
 
-            IDatabase db =
-                configuration.DatabaseConnectionString.IsNullOrEmpty()
+            IDatabase db = configuration.DatabaseConnectionString.IsNullOrEmpty()
                 ? new NoDatabaseDb()
-
                 : configuration.DatabaseConnectionString.Contains("mongodb")
-                ? new MongoDb(configuration.DatabaseConnectionString)
-
-                :
-                new NoDatabaseDb();
+                        ? new MongoDb(configuration.DatabaseConnectionString)
+                        : new DirectoryDb(configuration.DatabaseConnectionString);
 
             db = await db.InitializeAsync();
 
@@ -62,18 +58,7 @@ namespace Dynastio.Bot
 
             var youtubeService = new YoutubeService(configuration.YoutubeApiKey, configuration.DynastioYoutubeChannelId);
             await youtubeService.InitializeAsync();
-
-            BsonClassMap.RegisterClassMap<User>(cm =>
-            {
-                cm.AutoMap();
-                cm.MapCreator(x => new User(db));
-            });
-            BsonClassMap.RegisterClassMap<Guild>(cm =>
-            {
-                cm.AutoMap();
-                cm.MapCreator(x => new Guild(db));
-            });
-
+                      
             var services = new ServiceCollection()
                 .AddSingleton(configuration)
                 .AddSingleton(dynastClient)
@@ -100,7 +85,7 @@ namespace Dynastio.Bot
             AlwaysDownloadUsers = true,
             AlwaysDownloadDefaultStickers = false,
             DefaultRetryMode = RetryMode.AlwaysRetry,
-            
+
         };
         public async Task RunAsync(IServiceProvider _services)
         {

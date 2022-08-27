@@ -167,7 +167,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     return;
                 }
                 buser.RemoveAccount(selectedAccount);
-                await buser.UpdateAsync();
+                await userManager.UpdateAsync(Context.BotUser);
                 await FollowupAsync(embed: $"account removed from the user.".ToEmbed());
             }
             [RequireConfirmation]
@@ -182,7 +182,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 else
                     buser.IsBannedToAddNewAccount = status == PermissionsType.Limited;
 
-                await buser.UpdateAsync();
+                await userManager.UpdateAsync(Context.BotUser);
 
                 await FollowupAsync(embed: $"the {user.Id.ToUserMention()} permission to ` {section} ` is ` {status} `.".ToEmbed());
             }

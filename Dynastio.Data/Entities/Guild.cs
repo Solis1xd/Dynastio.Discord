@@ -11,18 +11,12 @@ namespace Dynastio.Data
     [BsonIgnoreExtraElements]
     public class Guild
     {
-        private readonly IDatabase db;
         public Guild() { }
-
-        public Guild(IDatabase db)
-        {
-            this.db = db;
-        }
         [BsonId]
         public ulong Id { get; set; }
         public bool IsModerationEnabled { get; set; } = false;
         public List<ulong> OnlyImageChannels { get; set; } = new();
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(IDatabase db)
         {
             await db.UpdateAsync(this);
         }

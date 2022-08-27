@@ -47,6 +47,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
         [Group("image-only", "image only channels")]
         public class ImageOnlyModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
+            public GuildService GuildService { get; set; }
             [RequireBotPermission(GuildPermission.ManageMessages)]
             [RequireChannelSlowmode(Program.ImageOnlyChannelsSlowMode)]
             [RateLimit(80, 8, RateLimit.RateLimitType.User)]
@@ -61,7 +62,8 @@ namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
                 }
 
                 Context.BotGuild.OnlyImageChannels.Add(channel.Id);
-                await Context.BotGuild.UpdateAsync();
+                await GuildService.UpdateAsync(Context.BotGuild);
+               
                 await FollowupAsync(Context.User.Id.ToUserMention(), embed: "The channel added to the image-channels.".ToSuccessfulEmbed("Channel Added"));
             }
             [SlashCommand("list", "Image Channels")]
@@ -79,7 +81,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
                 {
                     await FollowupAsync(Context.User.Id.ToUserMention(), embed: "The channel removed from image-channels.".ToWarnEmbed("Channel removed"));
                     Context.BotGuild.OnlyImageChannels.Remove(channel.Id);
-                    await Context.BotGuild.UpdateAsync();
+                    await GuildService.UpdateAsync(Context.BotGuild);
                     return;
                 }
                 else

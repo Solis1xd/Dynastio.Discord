@@ -26,13 +26,14 @@ namespace Dynastio.Bot.Interactions.Modules.Guild.Admin
         [RateLimit(30, 3, RateLimit.RateLimitType.Guild)]
         public class GuildSettings : CustomInteractionModuleBase<CustomSocketInteractionContext>
         {
+            public GuildService GuildService { get; set; }
             [SlashCommand("moderator", "moderate the server by dynast.io bot")]
             public async Task moderaotr(ModeraotrType status)
             {
                 await DeferAsync();
                 Context.BotGuild.IsModerationEnabled = status == ModeraotrType.Enable;
 
-                await Context.BotGuild.UpdateAsync();
+                await GuildService.UpdateAsync(Context.BotGuild);
                 await FollowupAsync(embed: $"Moderation is ` {status} ` for this server.".ToSuccessfulEmbed("Operation was successful"));
             }
             public enum ModeraotrType

@@ -12,13 +12,7 @@ namespace Dynastio.Data
     [BsonIgnoreExtraElements]
     public class User
     {
-        private readonly IDatabase db;
         public User() { }
-
-        public User(IDatabase db)
-        {
-            this.db = db;
-        }
         public ulong Id { get; set; }
         public List<UserAccount> Accounts { get; set; } = new();
         public DateTime LastHonorGift { get; set; } = DateTime.MinValue;
@@ -50,7 +44,7 @@ namespace Dynastio.Data
                 acc.IsDefault = false;
             Accounts.Find(a => a.Id == account.Id).IsDefault = true;
         }
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(IDatabase db)
         {
             await db.UpdateAsync(this);
         }

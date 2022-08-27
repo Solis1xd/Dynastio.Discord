@@ -64,7 +64,7 @@
 - [X] Image only channels
 
 - [X] Multi-language Support
- 	- [X] Support 22+ [Languages](https://discord.com/developers/docs/reference#locales)		
+ 	- [X] Support 1+ [Languages](https://discord.com/developers/docs/reference#locales)		
     - [ ] Thai	
     - [ ] English, UK
     - [ ] Portuguese, Brazilian
@@ -105,10 +105,10 @@ I have tried to implement all the available Apis in the bot, The bot uses a free
 {
   "BotToken": "Discord_Bot_Token",
   "DynastioApi":"Dynastio_Api_Token",
-  "YoutubeApiKey":"Youtube_Api_Key",
-  "DynastioYoutubeChannelId":"UCW0PmC1B8jjhpKLHciFp0xA",
-  "DatabaseConnectionString": "Your_Database_String_Connection", // MongoDB
-  "BotStatus":"In Development",
+  "YoutubeApiKey":"Youtube_Api_Key",    // Optional
+  "DynastioYoutubeChannelId":"UCW0PmC1B8jjhpKLHciFp0xA",   // Optional
+  "DatabaseConnectionString": "Your_Database_String_Connection", // Directory Path  Or  MongoDB ConnectionString
+  "BotStatus":"In Development",                     
   "OwnerId":805534924622004274,                                  //your discord user id
   "Guilds": {
     "MainServer": 875716592770637824,                        // your discord server id
@@ -119,7 +119,6 @@ I have tried to implement all the available Apis in the bot, The bot uses a free
     "JoinLeftLoggerChannel": 918560623573495918, // discord channel id
 	"ErrorLoggerChannel":948672329813209118,     // discord channel id
 	"HonorChannel":939878098873233438,           // discord channel id
-	"UploadsChannel":988054411014180874,         // discord channel id
   }
 }
 ```

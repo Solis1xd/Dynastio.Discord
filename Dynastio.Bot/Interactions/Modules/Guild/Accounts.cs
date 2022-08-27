@@ -60,7 +60,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
             }
 
             Context.BotUser.SwitchDefault(selectedAccount);
-            await Context.BotUser.UpdateAsync();
+            await userManager.UpdateAsync(Context.BotUser);
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
         [RequireUserDynastioAccount]
@@ -93,7 +93,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
 
             Context.BotUser.ReplaceAccount(selectedAccount.Id, selectedAccount);
 
-            await Context.BotUser.UpdateAsync();
+            await userManager.UpdateAsync(Context.BotUser);
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_changed"].ToSuccessfulEmbed(this["account_changed"]));
         }
@@ -121,7 +121,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
 
             Context.BotUser.RemoveAccount(selectedAccount);
 
-            await Context.BotUser.UpdateAsync();
+            await userManager.UpdateAsync(Context.BotUser);
 
             await FollowupAsync(Context.User.Id.ToUserMention(), embed: this["account_removed"].ToSuccessfulEmbed("account_removed"));
         }
@@ -247,7 +247,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
             };
             Context.BotUser.AddAccount(account);
 
-            await Context.BotUser.UpdateAsync();
+            await userManager.UpdateAsync(Context.BotUser);
 
             await FollowupAsync(Context.UserMention(), embed: this["account_added"].ToSuccessfulEmbed(this["account_added.title"]));
 
