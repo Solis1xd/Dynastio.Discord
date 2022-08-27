@@ -1,3 +1,6 @@
+0.5.4 - 28/08/2022
+- local db
+
 0.5.3 - 25/08/2022
 - "Reminder" & "Description" added for connected accounts.
 - command "/accounts edit" updated.

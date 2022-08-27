@@ -28,28 +28,37 @@ namespace Dynastio.Data
         {
             Program.Log("DirectoryDb", "InitializeAsync");
 
-            if (!Directory.Exists(_path))
+            try
             {
-                Program.Log("DirectoryDb", "Directory Path Not Found.");
-                return await Task.FromResult(new NoDatabaseDb());
+                if (!Directory.Exists(_path))
+                {
+                    Program.Log("DirectoryDb", "Directory path not found.", ConsoleColor.Red);
+                    Program.Log("DirectoryDb", "Set default directory path.", ConsoleColor.Green);
+
+                    _path = Directory.GetCurrentDirectory();
+                }
+
+                if (!File.Exists(usersPath))
+                    SaveUsersChanges();
+
+                if (!File.Exists(guildsPath))
+                    SaveGuildChanges();
+
+                var users = File.ReadAllText(usersPath);
+                _users = JsonConvert.DeserializeObject<List<User>>(users);
+
+                var guilds = File.ReadAllText(guildsPath);
+                _guilds = JsonConvert.DeserializeObject<List<Guild>>(guilds);
+
+                Program.Log("DirectoryDb", "Initialized");
+
+                return await Task.FromResult(this);
             }
-
-            if (!File.Exists(usersPath))
-                SaveUsersChanges();
-
-            if (!File.Exists(guildsPath))
-                SaveGuildChanges();
-
-
-            var users = File.ReadAllText(usersPath);
-            _users = JsonConvert.DeserializeObject<List<User>>(users);
-
-            var guilds = File.ReadAllText(guildsPath);
-            _guilds = JsonConvert.DeserializeObject<List<Guild>>(guilds);
-
-            Program.Log("DirectoryDb", "Initialized");
-
-            return await Task.FromResult(this);
+            catch
+            {
+                Program.Log("DirectoryDb", "Directory path not found.", ConsoleColor.Red);
+                return new NoDatabaseDb();
+            }
         }
 
         private List<User> _users { get; set; } = new();

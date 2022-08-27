@@ -14,6 +14,12 @@ namespace Dynastio.Data
         {
             Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);
         }
+        public static void Log(string service, string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
         public static bool IsDebug()
         {
 #if DEBUG
