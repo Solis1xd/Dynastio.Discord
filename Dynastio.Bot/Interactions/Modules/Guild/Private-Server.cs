@@ -9,27 +9,67 @@ using Dynastio.Net;
 
 using Discord.WebSocket;
 using Dynastio.Bot.Interactions.Modules.Shard;
+using MongoDB.Driver;
+using Dynastio.Data;
 
 namespace Dynastio.Bot.Interactions.Modules.Guild
 {
     [EnabledInDm(false)]
     [RequireContext(ContextType.Guild)]
-    [RequireBotPermission(ChannelPermission.AttachFiles)]
-    [RequireBotPermission(ChannelPermission.SendMessages)]
-    [Group("server", "dyanstio server")]
-    public class ServerModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
+    [RequireBotPermission(ChannelPermission.AttachFiles | ChannelPermission.SendMessages)]
+    [Group("private-server", "dyanstio private server")]
+    public class PrivateServerModule : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         public DynastioClient Dynastio { get; set; }
 
+
+        [RateLimit(120, 1, RateLimit.RateLimitType.User)]
+        [SlashCommand("items", "get private server items")]
+        public async Task items(bool Newest = false,int NewestNumber = 10)
+        {
+            await DeferAsync();
+
+            string content = "";
+
+            var items = (ItemType[])Enum.GetValues(typeof(ItemType));
+            if (Newest)
+                items = items.TakeLast(NewestNumber).ToArray();
+
+            var items_ = items.GroupBy(a => a.ToString()[0].ToString()).OrderBy(a => a.Key).ToList();
+            string[] headers = items_.Select(a => a.Key).ToArray();
+            foreach (var g in items_)
+                content += $"**{g.Key}:** ```" + string.Join(", ", g.Select(a => $"{a.ToString()}")) + "```";
+
+            await FollowupAsync(embed: content.ToEmbed(Newest ? "Newest Items" : "Items List"));
+        }
+        [RateLimit(120, 1, RateLimit.RateLimitType.User)]
+        [SlashCommand("entities", "get private server entities")]
+        public async Task entities(bool Newest = false, int NewestNumber = 10)
+        {
+            await DeferAsync();
+
+            string content = "";
+
+            var entities = (EntityType[])Enum.GetValues(typeof(EntityType));
+            if (Newest)
+                entities = entities.TakeLast(NewestNumber).ToArray();
+
+            var entitiesG = entities.GroupBy(a => a.ToString()[0].ToString()).OrderBy(a => a.Key).ToList();
+            string[] headers = entitiesG.Select(a => a.Key).ToArray();
+            foreach (var g in entitiesG)
+                content += $"**{g.Key}:** ```" + string.Join(", ", g.Select(a => $"{a.ToString()}")) + "```";
+
+            await FollowupAsync(embed: content.ToEmbed(Newest ? "Newest Entities" : "Entities List"));
+        }
         [RateLimit(10, 2, RateLimit.RateLimitType.User)]
         [SlashCommand("find", "get server information")]
         public async Task server(
-            [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server,
-            DynastioProviderType provider = DynastioProviderType.Main)
+                   [Autocomplete(typeof(SharedAutocompleteHandler.OnlinePrivateServersAutocompleteHandler))] string server,
+                   DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
             var dynastio = Dynastio[provider];
-            var result = dynastio.OnlineServers.FirstOrDefault(a => a.Label.ToLower().Contains(server));
+            var result = dynastio.OnlineServers.FirstOrDefault(a => a.GetHashCode().ToString() == server);
             if (result == null)
             {
                 await FollowupAsync(embed: $"Server `{server}` not found.".ToWarnEmbed("not found"));

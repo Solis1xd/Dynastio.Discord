@@ -28,7 +28,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 embed: (
                 $"Dynastio Current Version {provider} Is **{version.CurrentVersion}**" +
                 $"\n[Download]({version.DownloadUrl})"
-                ).ToEmbed("Dynastio Version"));
+                ).ToEmbed("Dynastio Version", Context.Client.CurrentUser.GetAvatarUrl()));
         }
     }
 }

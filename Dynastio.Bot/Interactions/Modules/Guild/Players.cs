@@ -72,7 +72,6 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
         [SlashCommand("search", "search for a list of online players")]
         public async Task players(
             [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
-            [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,
             SortType sort = SortType.Score,
             Map Map = Map.Disable,
             [MaxValue(50)] int take = 25,
@@ -99,8 +98,6 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 a.Level > MinLevel && a.Level < MaxLevel &&
                 a.Score > MinScore && a.Score < MaxScore
                 ).ToList();
-
-            if (filter != FilterType.All) players = players.Where(a => filter == FilterType.PrivateServer ? a.Parent.IsPrivate : !a.Parent.IsPrivate).ToList();
 
             switch (sort)
             {

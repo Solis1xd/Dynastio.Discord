@@ -27,16 +27,15 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
         public async Task toplist(
               [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
               [MaxValue(60)] int take = 25,
-              SortType sort = SortType.Score,
+              ToplistSortType sort = ToplistSortType.Score,
               [Summary("Map", "Display The Mini Map")] Map Map = Map.Disable,
-              [Summary("server-filter", "search in which servers")] FilterType filter = FilterType.All,
-              int page = 1,
+               int page = 1,
             DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
             var dynastioProvider = Dynastio[provider];
 
-            var players = dynastioProvider.OnlinePlayers.Where(a => filter == FilterType.PrivateServer ? a.Parent.IsPrivate : !a.Parent.IsPrivate).ToList() ?? null;
+            var players = dynastioProvider.OnlinePlayers.Where(a => !a.Parent.IsPrivate).ToList() ?? null;
             if (players == null)
             {
                 await FollowupAsync(embed: "No any online server found.".ToWarnEmbed("Not Found !"));
@@ -47,9 +46,30 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 a.Parent.Label.ToLower().Contains(server)
                 ).ToList();
 
-            players = sort == SortType.Score ?
-                 players.OrderByDescending(a => a.Score).ToList() :
-                 players.OrderByDescending(a => a.Level).ToList();
+            switch (sort)
+            {
+                default:
+                case ToplistSortType.Score:
+                    players.OrderByDescending(a => a.Score).ToList();
+                    break;
+
+                case ToplistSortType.Level:
+                    players.OrderByDescending(a => a.Level).ToList();
+                    break;
+                case ToplistSortType.Nickname:
+                    players.OrderByDescending(a => a.Nickname).ToList();
+                    break;
+                case ToplistSortType.Team:
+                    players.OrderByDescending(a => a.Team).ToList();
+                    break;
+                case ToplistSortType.Location:
+                    players.OrderByDescending(a => a.X * a.Y).ToList();
+                    break;
+                case ToplistSortType.ServerNickname:
+                    players.OrderByDescending(a => a.Parent.Label).ToList();
+                    break;
+            }
+
 
             var players1 = players.Skip((page - 1) * take).Take(take).ToList();
             var content = players1.ToStringTable(new[] { "#", this["server"], this["score"], this["level"], this["team"], this["nickname"] },
@@ -58,7 +78,8 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 a => a.Score.Metric(),
                 a => a.Level.Metric(),
                 a => a.Team.RemoveLines().TrySubstring(10),
-                a => a.Nickname.RemoveLines().TrySubstring(16)).ToMarkdown();
+                a => a.Nickname.RemoveLines().TrySubstring(16))
+                .ToMarkdown();
 
             var map = Map == Map.Enable ? GraphicService.GetMap(players1) : null;
 
@@ -71,10 +92,15 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 await FollowupAsync(Context.User.Id.ToUserMention(), embeds);
         }
 
-        public enum SortType
+        public enum ToplistSortType
         {
             Score,
             Level,
+            Nickname,
+            Team,
+            Location,
+            [ChoiceDisplay("Server Nickname")]
+            ServerNickname
         }
 
     }

@@ -44,7 +44,12 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 var dataGuilds = JsonConvert.SerializeObject(guilds);
                 await DiscordStream.SendStringAsFile(Context.Channel, dataGuilds, "guilds.json");
 
-                var msg = await FollowupAsync(embed: $"{users.Count} users and {guilds.Count} guilds uploaded.".ToSuccessfulEmbed("backup " + DateTime.UtcNow));
+
+                var msg = await FollowupAsync(
+                    embed: 
+                    ($"Total Users: {users.Count}\n" +
+                    $"Total Guilds: {guilds.Count}\n" +
+                    $"data uploaded succesfully.").ToSuccessfulEmbed("backup " + DateTime.UtcNow));
             }
         }
         [Group("youtube", "users commands")]
@@ -177,11 +182,19 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                 //await DeferAsync();
                 var buser = await userManager.GetUserAsync(user.Id);
 
-                if (section == UserBanType.Bot)
-                    buser.IsBanned = status == PermissionsType.Limited;
-                else
-                    buser.IsBannedToAddNewAccount = status == PermissionsType.Limited;
-
+                switch (section)
+                {
+                    case UserBanType.Bot:
+                        buser.IsBanned = status == PermissionsType.Limited;
+                        break;
+                    case UserBanType.AddAccount:
+                        buser.IsBannedToAddNewAccount = status == PermissionsType.Limited;
+                        break;
+                    case UserBanType.AddPrivateServerCommand:
+                        buser.IsBannedToAddNewPrivateServerCommand = status == PermissionsType.Limited;
+                        break;
+                }
+              
                 await userManager.UpdateAsync(Context.BotUser);
 
                 await FollowupAsync(embed: $"the {user.Id.ToUserMention()} permission to ` {section} ` is ` {status} `.".ToEmbed());
@@ -190,7 +203,9 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
             {
                 Bot,
                 [Display(Name = "Add Account")]
-                AddAccount
+                AddAccount,
+                [Display(Name = "Add command to the private server commands.")]
+                AddPrivateServerCommand
             }
             public enum PermissionsType
             {

@@ -31,7 +31,7 @@ namespace Dynastio.Data
                 Program.Log("Mongodb", "StartSessionAsync");
 
                 await _db.StartSessionAsync();
-              
+
                 Program.Log("Mongodb", "Session Started");
                 return this;
             }
@@ -142,6 +142,6 @@ namespace Dynastio.Data
             this._db = null;
         }
 
-       
+
     }
 }

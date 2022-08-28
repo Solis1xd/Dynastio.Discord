@@ -1,5 +1,11 @@
 0.5.4 - 28/08/2022
 - local db
+- fix "/toplist" bug (private server label length)
+- sort players by more options
+- command "/player find" changed to "/user find"
+- new command "/private-server items" 
+- new command "/private-server entities" 
+- new command "/private-server find" 
 
 0.5.3 - 25/08/2022
 - "Reminder" & "Description" added for connected accounts.

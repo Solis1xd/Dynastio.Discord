@@ -21,8 +21,7 @@ namespace Dynastio.Data
         {
             _path = path;
         }
-        private string usersPath { get => Path.Combine(_path + "users.json"); }
-        private string guildsPath { get => Path.Combine(_path + "guilds.json"); }
+
 
         public async Task<IDatabase> InitializeAsync()
         {
@@ -30,7 +29,11 @@ namespace Dynastio.Data
 
             try
             {
-                if (!Directory.Exists(_path))
+                if (string.IsNullOrEmpty(_path))
+                {
+                    _path = Directory.GetCurrentDirectory();
+                }
+                else if (!Directory.Exists(_path))
                 {
                     Program.Log("DirectoryDb", "Directory path not found.", ConsoleColor.Red);
                     Program.Log("DirectoryDb", "Set default directory path.", ConsoleColor.Green);
@@ -44,11 +47,15 @@ namespace Dynastio.Data
                 if (!File.Exists(guildsPath))
                     SaveGuildChanges();
 
+            
+
                 var users = File.ReadAllText(usersPath);
                 _users = JsonConvert.DeserializeObject<List<User>>(users);
 
                 var guilds = File.ReadAllText(guildsPath);
                 _guilds = JsonConvert.DeserializeObject<List<Guild>>(guilds);
+
+  
 
                 Program.Log("DirectoryDb", "Initialized");
 
@@ -56,10 +63,13 @@ namespace Dynastio.Data
             }
             catch
             {
-                Program.Log("DirectoryDb", "Directory path not found.", ConsoleColor.Red);
+                Program.Log("DirectoryDb", "Directory path not found or Not accessible.", ConsoleColor.Red);
                 return new NoDatabaseDb();
             }
         }
+        private string usersPath { get => Path.Combine(_path + "users.json"); }
+        private string guildsPath { get => Path.Combine(_path + "guilds.json"); }
+
 
         private List<User> _users { get; set; } = new();
         private List<Guild> _guilds { get; set; } = new();
@@ -159,6 +169,6 @@ namespace Dynastio.Data
             _guilds.Clear();
         }
 
-
+     
     }
 }

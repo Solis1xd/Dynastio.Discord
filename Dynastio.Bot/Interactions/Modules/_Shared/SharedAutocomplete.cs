@@ -50,12 +50,9 @@ namespace Dynastio.Bot.Interactions.Modules.Shard
                 var provider_ = autocompleteInteraction.Data.Options.FirstOrDefault(a => a.Name == "provider");
                 string provider = provider_ != null ? provider_.Value.ToString() : DynastioProviderType.Main.ToString();
 
-                var serverFilter = autocompleteInteraction.Data.Options.FirstOrDefault(a => a.Name == "server-filter");
-                FilterType serverFilter_ = serverFilter != null ? (FilterType)Enum.Parse(typeof(FilterType), (string)serverFilter.Value) : FilterType.All;
-
                 var servers = Dynastio[provider].OnlineServers.Where(
                     a =>
-                    serverFilter_ == FilterType.PrivateServer ? a.IsPrivate : !a.IsPrivate &&
+                    a.IsPrivate == false &&
                     a.Label.ToLower().Contains(match)).Take(25).ToList();
 
                 foreach (var server in servers)
@@ -64,6 +61,35 @@ namespace Dynastio.Bot.Interactions.Modules.Shard
                     {
                         Name = server.Label.TrySubstring(98),
                         Value = server.Label.TrySubstring(30, false)
+                    });
+                }
+                // max - 25 suggestions at a time (API limit)
+                return await Task.FromResult(AutocompletionResult.FromSuccess(results));
+            }
+        }
+        public class OnlinePrivateServersAutocompleteHandler : AutocompleteHandler
+        {
+            public DynastioClient Dynastio { get; set; }
+            public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+            {
+                List<AutocompleteResult> results = new();
+
+                string match = autocompleteInteraction.Data.Current.Value.ToString();
+
+                var provider_ = autocompleteInteraction.Data.Options.FirstOrDefault(a => a.Name == "provider");
+                string provider = provider_ != null ? provider_.Value.ToString() : DynastioProviderType.Main.ToString();
+
+                var servers = Dynastio[provider].OnlineServers.Where(
+                    a =>
+                    a.IsPrivate == true &&
+                    a.Label.ToLower().Contains(match)).Take(25).ToList();
+
+                foreach (var server in servers)
+                {
+                    results.Add(new AutocompleteResult()
+                    {
+                        Name = server.Label.RemoveHtmlTags().TrySubstring(98),
+                        Value = server.GetHashCode().ToString()
                     });
                 }
                 // max - 25 suggestions at a time (API limit)
@@ -101,6 +127,8 @@ namespace Dynastio.Bot.Interactions.Modules.Shard
                 return await Task.FromResult(AutocompletionResult.FromSuccess(results));
             }
         }
+     
+
 
     }
 }

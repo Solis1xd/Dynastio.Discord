@@ -43,7 +43,7 @@ namespace Dynastio.Bot
             var graphicService = new GraphicService().Initialize();
 
             IDatabase db = configuration.DatabaseConnectionString.IsNullOrEmpty()
-                ? new NoDatabaseDb()
+                ? new DirectoryDb(configuration.DatabaseConnectionString)
                 : configuration.DatabaseConnectionString.Contains("mongodb")
                         ? new MongoDb(configuration.DatabaseConnectionString)
                         : new DirectoryDb(configuration.DatabaseConnectionString);
@@ -114,6 +114,12 @@ namespace Dynastio.Bot
         public static void Log(string service, string text)
         {
             Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);
+        }
+        public static void Log(string service, string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);
+            Console.ResetColor();
         }
         public static bool IsDebug()
         {

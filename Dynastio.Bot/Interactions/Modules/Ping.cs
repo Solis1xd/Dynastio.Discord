@@ -20,7 +20,10 @@ namespace Dynastio.Bot.Interactions.Modules
         public async Task ping()
         {
             await DeferAsync();
-            await FollowupAsync($"Pong ! Roundtrip latency: ` {Context.Client.Latency} `, Startup: {Program.StartUp.ToDiscordUnixTimestampFormat()}");
+            await FollowupAsync(
+                embed:
+                $"Roundtrip latency: ` {Context.Client.Latency} `, Startup: {Program.StartUp.ToDiscordUnixTimestampFormat()}"
+                .ToSuccessfulEmbed("Pong !", Context.Client.CurrentUser.GetAvatarUrl()));
         }
     }
 

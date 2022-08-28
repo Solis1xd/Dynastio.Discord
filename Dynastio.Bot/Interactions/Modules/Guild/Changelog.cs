@@ -45,13 +45,13 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 content += $"\n\n" +
                            this["page:*", $"{page}/{pages.Count}\n"] +
                            this["closes:*", 20.ToDiscordUnixTimeFromat()];
-                var message = await FollowupAsync(Context.User.Id.ToUserMention(), components: componenets.Build(), embed: content.Remove(version).ToEmbed(version));
+                var message = await FollowupAsync(Context.User.Id.ToUserMention(), components: componenets.Build(), embed: content.Remove(version).ToEmbed(version, Context.Client.CurrentUser.GetAvatarUrl()));
 
                 await message.WhenNoResponse(Context, TimeSpan.FromSeconds(50), async (x) => { await ToNoComponent(x); });
             }
             catch
             {
-                await FollowupAsync(Context.User.Id.ToUserMention(), embed: changelog.Substring(0, 800).ToEmbed("Changelog"));
+                await FollowupAsync(Context.User.Id.ToUserMention(), embed: changelog.Substring(0, 800).ToEmbed("Changelog", Context.Client.CurrentUser.GetAvatarUrl()));
             }
         }
         [RequireUser]

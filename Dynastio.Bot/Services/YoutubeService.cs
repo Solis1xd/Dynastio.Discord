@@ -10,36 +10,39 @@ namespace Dynastio.Bot
 {
     public class YoutubeService
     {
-        private readonly YouTubeService youtube;
+        private YouTubeService youtube;
         private readonly string mainChannelId;
+        private readonly string apiKey;
         public List<SearchResult> Videos { get; set; }
         public YoutubeService(string apiKey, string mainChannelId)
         {
             if (apiKey == null || mainChannelId == null)
             {
-                Program.Log("YoutubeService", "api key not found.");
+                Program.Log("YoutubeService", "api key not found.", ConsoleColor.Red);
                 return;
             }
-            Program.IsYoutubeServiceInitialized = true;
+            this.apiKey = apiKey;
+            this.mainChannelId = mainChannelId;
+        }
+        public async Task InitializeAsync()
+        {
+            if (Program.IsDebug())
+            {
+                Program.Log("YoutubeService", "Disabled in debug mode.", ConsoleColor.DarkYellow);
+                return;
+            }
+
+            Program.Log("YoutubeService", "Initializing..");
 
             youtube = new YouTubeService(new Google.Apis.Services.BaseClientService.Initializer()
             {
                 ApiKey = apiKey
             });
-            this.mainChannelId = mainChannelId;
-        }
-        public async Task InitializeAsync()
-        {
-            Program.Log("YoutubeService", "Initializing..");
-
-            if (!Program.IsYoutubeServiceInitialized)
-            {
-                Program.Log("YoutubeService", "Not Initialized.");
-                return;
-            }
 
             Program.Log("YoutubeService", "Get channel videos..");
+
             Videos = await GetAllChannelVideos(mainChannelId);
+            Program.IsYoutubeServiceInitialized = true;
 
             Program.Log("YoutubeService", "Initialized.");
         }

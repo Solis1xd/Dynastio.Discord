@@ -10,7 +10,7 @@ namespace Dynastio.Data
     {
         public NoDatabaseDb()
         {
-            Program.Log("NoDatabaseDb", "No Database");
+            Program.Log("NoDatabaseDb", "No Database", ConsoleColor.Red);
         }
 
         public Task<IDatabase> InitializeAsync()
@@ -74,5 +74,6 @@ namespace Dynastio.Data
             return Task.FromResult(true);
         }
 
+  
     }
 }

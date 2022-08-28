@@ -23,6 +23,41 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
         public DynastioClient Dynastio { get; set; }
         public UserService UserService { get; set; }
 
+        [RateLimit(10, 2, RateLimit.RateLimitType.User)]
+        [SlashCommand("find", "find a discord user in the game")]
+        public async Task Find(IUser user,
+                    DynastioProviderType provider = DynastioProviderType.Main)
+        {
+            await DeferAsync();
+            var botUser = await UserService.GetUserAsync(user.Id, false);
+            if (botUser is null || botUser.Accounts == null || botUser.Accounts.Count == 0)
+            {
+                await FollowupAsync(embed: "No any account of this user found.".ToWarnEmbed("Not Found !", user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+                return;
+            }
+            var accounts = botUser.Accounts.Select(a => a.Id).ToList();
+
+            var result = Dynastio[provider].OnlinePlayers.FirstOrDefault(a => accounts.Contains(a.Id));
+            if (result == null)
+            {
+                await FollowupAsync(embed: "No any online account of this user found.".ToWarnEmbed($"{user.Username} is offline !", user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+                return;
+            }
+
+            var team = Dynastio[provider].OnlinePlayers.GroupBy(a => a.Team).FirstOrDefault(a => a.Key == result.Team && !string.IsNullOrEmpty(a.Key));
+
+            var teammates = team is null ? "`none`" : string.Join(", ", team.Select(a => a.Nickname));
+            string content =
+                $"**Nickname:** {result.Nickname.TrySubstring(18)}\n" +
+                $"**Level:** {result.Level}\n" +
+                $"**Score:** {result.Score.Metric()}\n" +
+                $"**Server:** {result.Parent.Label.RemoveHtmlTags().TrySubstring(20)}\n" +
+                $"**Team:** {result.Team}\n" +
+                $"**Teammates:**: {teammates.ToMarkdown()}";
+
+            await FollowupAsync(embed: content.ToEmbed(user.Username + " (Online Player)", user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+        }
+
         [RateLimit(70, 4, RateLimit.RateLimitType.User)]
         [SlashCommand("profile", "your dynastio profile")]
         public async Task profile(

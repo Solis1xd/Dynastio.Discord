@@ -18,7 +18,7 @@ namespace Dynastio.Data
         {
             Console.ForegroundColor = color;
             Console.WriteLine(DateTime.UtcNow.ToString("T") + " " + service.PadRight(20) + text);
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ResetColor();
         }
         public static bool IsDebug()
         {

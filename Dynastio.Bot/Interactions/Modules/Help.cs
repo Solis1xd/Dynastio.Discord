@@ -19,7 +19,7 @@ namespace Dynastio.Bot.Interactions.Modules
         public async Task help()
         {
             await DeferAsync();
-            await FollowupAsync(embed: "This command is not available yet.".ToEmbed("Command Is Disabled"));
+            await FollowupAsync(embed: "This command is not available yet.".ToEmbed("Command Is Disabled", Context.Client.CurrentUser.GetAvatarUrl()));
         }
     }
 }

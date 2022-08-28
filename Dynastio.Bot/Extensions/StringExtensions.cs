@@ -10,6 +10,10 @@ namespace Dynastio.Bot
 {
     public static class StringExtensions
     {
+        public static string RemoveHtmlTags(this string value)
+        {
+            return Regex.Replace(value, "<.*?>", String.Empty);
+        }
         public static string ToBold(this string value)
         {
             return $"**{value}**";
