@@ -16,7 +16,7 @@ namespace Dynastio.Data
         public ulong Id { get; set; }
         public bool IsModerationEnabled { get; set; } = false;
         public List<ulong> OnlyImageChannels { get; set; } = new();
-        public async Task UpdateAsync(IDatabase db)
+        public async Task UpdateAsync(IDatabaseContext db)
         {
             await db.UpdateAsync(this);
         }

@@ -1,19 +1,13 @@
-﻿using Discord.Interactions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dynastio.Bot;
-using Discord.WebSocket;
-using Discord;
-using Dynastio;
-using Microsoft.Extensions.DependencyInjection;
-using Dynastio.Data;
-
-namespace Discord.Interactions
+﻿namespace Discord.Interactions
 {
-
+    using Discord.Interactions;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Dynastio.Bot;
+    using Discord;
     public class RequireConfirmation : PreconditionAttribute
     {
         public RequireConfirmation(

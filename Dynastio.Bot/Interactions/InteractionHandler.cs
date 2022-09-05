@@ -20,7 +20,7 @@ namespace Dynastio.Bot.Interactions
         private readonly Configuration _configuration;
         private readonly UserService userService;
         private readonly LocaleService localeService;
-        private readonly IDatabase _db;
+        private readonly IDatabaseContext _db;
         private readonly GuildService _guildservice;
 
         public DynastioClient _dynastClient { get; set; }
@@ -33,7 +33,7 @@ namespace Dynastio.Bot.Interactions
             _dynastClient = services.GetRequiredService<DynastioClient>();
             localeService = services.GetRequiredService<LocaleService>();
             _guildservice = services.GetRequiredService<GuildService>();
-            _db = services.GetRequiredService<IDatabase>();
+            _db = services.GetRequiredService<IDatabaseContext>();
             _services = services;
         }
 

@@ -113,9 +113,10 @@ namespace Dynastio.Bot
             }
             return image;
         }
-        public Image GetProfile(Profile profile)
+       
+        public Image GetProfile(Profile profile, ProfileStyle profileStyle = ProfileStyle.Default)
         {
-            Image image = Image.Load($@"Images/Profile/default.png".ResourcesPath());
+            Image image = Image.Load($@"Images/Profile/{profileStyle.ToString().ToLower()}.png".ResourcesPath());
 
             var pointCoinSection = new PointF() { X = (405 - (16 * profile.Coins.ToString().Length)), Y = 28 };
             image.Mutate(x => x.DrawText(profile.Coins.ToString(), new Font(fontFamily, 30, FontStyle.Regular), Color.White, pointCoinSection));

@@ -14,18 +14,18 @@ using System.Timers;
 
 namespace Dynastio.Data
 {
-    public class DirectoryDb : IDatabase, IDisposable
+    public class DirectoryDbContext : IDatabaseContext, IDisposable
     {
         private string _path = "";
-        public DirectoryDb(string path)
+        public DirectoryDbContext(string path)
         {
             _path = path;
         }
 
 
-        public async Task<IDatabase> InitializeAsync()
+        public async Task<IDatabaseContext> InitializeAsync()
         {
-            Program.Log("DirectoryDb", "InitializeAsync");
+            Program.Log("DirectoryDbContext", "InitializeAsync");
 
             try
             {
@@ -35,8 +35,8 @@ namespace Dynastio.Data
                 }
                 else if (!Directory.Exists(_path))
                 {
-                    Program.Log("DirectoryDb", "Directory path not found.", ConsoleColor.Red);
-                    Program.Log("DirectoryDb", "Set default directory path.", ConsoleColor.Green);
+                    Program.Log("DirectoryDbContext", "Directory path not found.", ConsoleColor.Red);
+                    Program.Log("DirectoryDbContext", "Set default directory path.", ConsoleColor.Green);
 
                     _path = Directory.GetCurrentDirectory();
                 }
@@ -57,14 +57,14 @@ namespace Dynastio.Data
 
   
 
-                Program.Log("DirectoryDb", "Initialized");
+                Program.Log("DirectoryDbContext", "Initialized");
 
                 return await Task.FromResult(this);
             }
             catch
             {
-                Program.Log("DirectoryDb", "Directory path not found or Not accessible.", ConsoleColor.Red);
-                return new NoDatabaseDb();
+                Program.Log("DirectoryDbContext", "Directory path not found or Not accessible.", ConsoleColor.Red);
+                return new NoDatabaseDbContext();
             }
         }
         private string usersPath { get => Path.Combine(_path + "users.json"); }

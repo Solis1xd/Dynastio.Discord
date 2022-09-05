@@ -12,10 +12,10 @@ using System.Timers;
 
 namespace Dynastio.Data
 {
-    public class MongoDb : IDatabase, IDisposable
+    public class MongoDbContext : IDatabaseContext, IDisposable
     {
         private MongoClient _db { get; set; }
-        public MongoDb(string mongoConnection)
+        public MongoDbContext(string mongoConnection)
         {
             Program.Log("Mongodb", "InitializeAsync");
 
@@ -24,7 +24,7 @@ namespace Dynastio.Data
 
             Program.Log("Mongodb", "Initialized");
         }
-        public async Task<IDatabase> InitializeAsync()
+        public async Task<IDatabaseContext> InitializeAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace Dynastio.Data
                 Console.WriteLine("Mongodb Not Connected");
                 this.Dispose();
 
-                return new NoDatabaseDb();
+                return new NoDatabaseDbContext();
             }
         }
 

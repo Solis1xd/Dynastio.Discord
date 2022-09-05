@@ -88,47 +88,61 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
 
             [RateLimit(5, 2)]
             [SlashCommand("random", "get a random video")]
-            [ComponentInteraction("videos.featured.random:*:*", true)]
-            public async Task random(LocalType local = LocalType.common, DynastioProviderType provider = DynastioProviderType.Main)
+            [ComponentInteraction("videos.featured.random:*", true)]
+            public async Task random(DynastioProviderType provider = DynastioProviderType.Main)
             {
                 await DeferAsync();
 
-                var videos = Dynastio[provider].FeaturedVideos.Where(a => a.Group == local.ToString()).ToList();
-                if (videos == null || videos.Count == 0)
-                {
-                    await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
-                    return;
-                }
-                var index = Program.Random.Next(videos.Count);
-                var video = videos[index];
-
-                var componenets = new ComponentBuilder();
-                componenets.WithButton(this["next"], $"videos.featured.random:{local}:{provider}", ButtonStyle.Success, new Emoji("⏩"), null, false, 0);
-
-                var message = await FollowupAsync(video.Url, components: componenets.Build());
-            }
-            public enum LocalType { ru, common }
-
-            [RateLimit(5)]
-            [SlashCommand("get", "get a list of videos")]
-            public async Task get(int skip = 0, [MaxValue(50)] int take = 50, DynastioProviderType provider = DynastioProviderType.Main)
-            {
-                await DeferAsync();
                 var videos = Dynastio[provider].FeaturedVideos.ToList();
                 if (videos == null || videos.Count == 0)
                 {
                     await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
                     return;
                 }
-                var content = $"**Totall Featured Videos**: {videos.Count}\n";
-                videos = videos.Skip(skip).Take(take).ToList();
-                videos.ForEach(a =>
+
+                var index = Program.Random.Next(videos.Count);
+                var video = videos[index];
+
+                var componenets = new ComponentBuilder();
+                componenets.WithButton(this["next"], $"videos.featured.random:{provider}", ButtonStyle.Success, new Emoji("⏩"), null, false, 0);
+
+                await FollowupAsync(video.Url, components: componenets.Build());
+            }
+            public enum LocalType { ru, common }
+
+            [RateLimit(5)]
+            [SlashCommand("get", "get a list of videos")]
+            public async Task get(int skip = 0, [MaxValue(10)] int take = 10, DynastioProviderType provider = DynastioProviderType.Main)
+            {
+                await DeferAsync();
+
+                var totalVideos = Dynastio[provider].FeaturedVideos.ToList();
+                if (totalVideos == null || totalVideos.Count == 0)
                 {
-                    content +=
-                    $"Url: {a.Url}\n" +
-                    $"ExpireAt: {a.ExpireAt.ToDiscordUnixTimestampFormat()}\n\n";
-                });
-                await FollowupAsync(embed: content.ToEmbed("Videos"));
+                    await FollowupAsync(embed: "No video found.".ToWarnEmbed("not found"));
+                    return;
+                }
+
+                var selectedVideos = totalVideos.Skip(skip).Take(take).ToList();
+
+                var embeds = new List<Embed>();
+
+                for (int i = 0; i < selectedVideos.Count; i++)
+                {
+                    var video = selectedVideos[i];
+                    var embed = new EmbedBuilder()
+                    {
+
+                        Description =
+                        $"\nUrl: {video.Url}" +
+                        $"\nGroup: {video.Group}" +
+                        $"\nExpire At: {video.ExpireAt.ToDiscordUnixTimestampFormat()}",
+                        ThumbnailUrl = video.Texture,
+                    }.Build();
+                    embeds.Add(embed);
+                };
+
+                await FollowupAsync(embeds: embeds.ToArray());
             }
 
         }

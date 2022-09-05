@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Dynastio.Net;
-
 using Discord.WebSocket;
 using Dynastio.Bot.Interactions.Modules.Shard;
 
@@ -26,16 +25,15 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
         [SlashCommand("toplist", "a list of top players")]
         public async Task toplist(
               [Autocomplete(typeof(SharedAutocompleteHandler.OnlineServersAutocompleteHandler))] string server = "",
-              [MaxValue(60)] int take = 25,
+              [MaxValue(60)] int take = 30,
               ToplistSortType sort = ToplistSortType.Score,
               [Summary("Map", "Display The Mini Map")] Map Map = Map.Disable,
                int page = 1,
             DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
-            var dynastioProvider = Dynastio[provider];
 
-            var players = dynastioProvider.OnlinePlayers.Where(a => !a.Parent.IsPrivate).ToList() ?? null;
+            var players = Dynastio[provider].OnlinePlayers.Where(a => !a.Parent.IsPrivate).ToList() ?? null;
             if (players == null)
             {
                 await FollowupAsync(embed: "No any online server found.".ToWarnEmbed("Not Found !"));

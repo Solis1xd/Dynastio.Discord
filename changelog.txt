@@ -1,3 +1,11 @@
+0.5.5 - 05/09/2022
+- dynastio featured videos added to the bot
+- profile styles added to "/profile picture"
+- new command "/personal chest-all"
+- new command "/map"
+- new command "/videos featured get"
+- new command "/videos featured random"
+
 0.5.4 - 28/08/2022
 - local db
 - fix "/toplist" bug (private server label length)

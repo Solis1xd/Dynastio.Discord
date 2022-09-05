@@ -14,7 +14,7 @@ namespace Discord.Interactions
 {
     public class RequireUserAttribute : PreconditionAttribute
     {
-        public RequireUserAttribute(RequireUserType requireUserType = RequireUserType.Mention)
+        public RequireUserAttribute(RequireUserType requireUserType = RequireUserType.FromMention)
         {
             this.RequireType = requireUserType;
         }
@@ -25,7 +25,7 @@ namespace Discord.Interactions
             {
                 switch (RequireType.Value)
                 {
-                    case RequireUserType.Mention:
+                    case RequireUserType.FromMention:
                         {
                             if (context.Interaction is SocketMessageComponent componentContext)
                             {
@@ -57,9 +57,10 @@ namespace Discord.Interactions
         }
         public enum RequireUserType
         {
-            Mention,
+            FromMention,
+            FromSlashCommand,
             MainGuildOwner,
-            BotOwner
+            BotOwner,
         }
     }
 }

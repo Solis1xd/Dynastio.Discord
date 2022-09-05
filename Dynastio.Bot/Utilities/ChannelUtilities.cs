@@ -63,7 +63,7 @@ namespace Dynastio.Bot
             }
             return false;
         }
-        public static async Task CheckImageOnlyChannels(IDatabase _db, DiscordSocketClient _client, LocaleService _localeService)
+        public static async Task CheckImageOnlyChannels(IDatabaseContext _db, DiscordSocketClient _client, LocaleService _localeService)
         {
             var guilds = await _db.GetGuildsByMessageOnlyChannelsAsync();
             foreach (var g in guilds)

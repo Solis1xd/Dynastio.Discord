@@ -13,9 +13,9 @@ namespace Dynastio.Bot
     public class UserService
     {
         private readonly ConcurrentBag<User> users;
-        private readonly IDatabase db;
+        private readonly IDatabaseContext db;
         private readonly DynastioClient dynastioClient;
-        public UserService(IDatabase db, DynastioClient dynastioClient)
+        public UserService(IDatabaseContext db, DynastioClient dynastioClient)
         {
             Program.Log("UserService", "StartAsync");
 

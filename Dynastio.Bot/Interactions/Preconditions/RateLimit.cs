@@ -1,16 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord.WebSocket;
-using System.Collections.Concurrent;
+﻿//Originally made by jalaljaleh for Dynastio.Discord
+//Read the original file at https://github.com/jalaljaleh/Dynastio.Discord/blob/master/Dynastio.Bot/Interactions/Preconditions/RateLimit.cs
+//Originally licensed under Apache 2.0 https://github.com/jalaljaleh/Dynastio.Discord/blob/master/LICENSE.txt
+//Modifications:
+// 
 
 namespace Discord.Interactions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Discord.WebSocket;
+    using System.Collections.Concurrent;
+
     public class RateLimit : PreconditionAttribute
     {
-        private static ConcurrentDictionary<ulong, List<RateLimitItem>> Items = new();
+        private static ConcurrentDictionary<ulong, List<RateLimitItem>> Items = new ConcurrentDictionary<ulong, List<RateLimitItem>>();
+        private static DateTime _removeExpiredCommandsTime = DateTime.MinValue;
         private readonly RateLimitType? _context;
         private readonly RateLimitBaseType _baseType;
         private readonly int _requests;
@@ -24,6 +31,16 @@ namespace Discord.Interactions
         }
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
+            // clear old expired commands every 30m
+            if (DateTime.UtcNow > _removeExpiredCommandsTime)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await ClearExpiredCommands();
+                    _removeExpiredCommandsTime = DateTime.Now.AddMinutes(30);
+                });
+            }
+
             ulong id = _context.Value switch
             {
                 RateLimitType.User => context.User.Id,
@@ -57,7 +74,6 @@ namespace Discord.Interactions
                 if (dateTime >= c.expireAt)
                     target.Remove(c);
 
-
             if (commands.Count() < _requests)
             {
                 target.Add(new RateLimitItem()
@@ -68,7 +84,17 @@ namespace Discord.Interactions
                 return Task.FromResult(PreconditionResult.FromSuccess());
             }
 
-            return Task.FromResult(PreconditionResult.FromError($"{_context} using this command very fast, you can use this command every {_seconds} seconds, wait a while."));
+            return Task.FromResult(PreconditionResult.FromError($"This command is usable <t:{((DateTimeOffset)target.Last().expireAt).ToUnixTimeSeconds()}:R>."));
+        }
+        public static Task ClearExpiredCommands()
+        {
+            foreach (var doc in Items)
+            {
+                var utcTime = DateTime.UtcNow;
+                foreach (var command in doc.Value.Where(a => utcTime > a.expireAt).ToList())
+                    doc.Value.Remove(command);
+            }
+            return Task.CompletedTask;
         }
         private class RateLimitItem
         {

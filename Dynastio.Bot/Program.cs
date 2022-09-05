@@ -42,11 +42,11 @@ namespace Dynastio.Bot
 
             var graphicService = new GraphicService().Initialize();
 
-            IDatabase db = configuration.DatabaseConnectionString.IsNullOrEmpty()
-                ? new DirectoryDb(configuration.DatabaseConnectionString)
+            IDatabaseContext db = configuration.DatabaseConnectionString.IsNullOrEmpty()
+                ? new DirectoryDbContext(configuration.DatabaseConnectionString)
                 : configuration.DatabaseConnectionString.Contains("mongodb")
-                        ? new MongoDb(configuration.DatabaseConnectionString)
-                        : new DirectoryDb(configuration.DatabaseConnectionString);
+                        ? new MongoDbContext(configuration.DatabaseConnectionString)
+                        : new DirectoryDbContext(configuration.DatabaseConnectionString);
 
             db = await db.InitializeAsync();
 
@@ -62,7 +62,7 @@ namespace Dynastio.Bot
             var services = new ServiceCollection()
                 .AddSingleton(configuration)
                 .AddSingleton(dynastClient)
-                .AddSingleton((IDatabase)db)
+                .AddSingleton((IDatabaseContext)db)
                 .AddSingleton(userService)
                 .AddSingleton(guildService)
                 .AddSingleton(graphicService)

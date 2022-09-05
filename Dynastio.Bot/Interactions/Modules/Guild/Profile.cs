@@ -26,7 +26,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
         [RateLimit(70, 2, RateLimit.RateLimitType.User)]
         [SlashCommand("picture", "your dynastio profile")]
         public async Task profile([Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
-                bool Cache = true,
+                ProfileStyle style = ProfileStyle.Default,
                 DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
@@ -49,7 +49,7 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
                 return;
             }
 
-            var image = GraphicService.GetProfile(profile);
+            var image = GraphicService.GetProfile(profile,style);
             var msg = await FollowupWithFileAsync(image, "profile.jpeg");
         }
 

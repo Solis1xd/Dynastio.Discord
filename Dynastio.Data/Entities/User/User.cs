@@ -45,7 +45,7 @@ namespace Dynastio.Data
                 acc.IsDefault = false;
             Accounts.Find(a => a.Id == account.Id).IsDefault = true;
         }
-        public async Task UpdateAsync(IDatabase db)
+        public async Task UpdateAsync(IDatabaseContext db)
         {
             await db.UpdateAsync(this);
         }

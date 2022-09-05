@@ -23,81 +23,80 @@ namespace Dynastio.Bot.Interactions.Modules.Guild
         public DynastioClient Dynastio { get; set; }
 
         [RequireUserDynastioAccount]
+        [SlashCommand("chest-all", "All of your private chests")]
+        public async Task personalChests(bool countItems = false)
+        {
+            await DeferAsync();
+
+            var chests = await Context.BotUser.Accounts.GetPersonalchests(Dynastio.Main);
+            if (chests == null || chests.Count == 0)
+            {
+                await FollowupAsync("chest not found.");
+                return;
+            }
+            var image = GraphicService.GetPersonalChests(chests.ToArray());
+
+            string content = "";
+
+            if (countItems)
+            {
+                Dictionary<string, int> items = new();
+                foreach (var chest in chests)
+                {
+                    foreach (var item in chest.Items)
+                    {
+                        var count = item.Count;
+                        if (items.TryGetValue(item.ItemType.ToString(), out int v))
+                        {
+                            items[item.ItemType.ToString()] = v + count;
+                        }
+                        else
+                        {
+                            items.Add(item.ItemType.ToString(), count);
+                        }
+                    }
+                }
+
+                content = items.OrderByDescending(a => a.Value).ToStringTable(new string[] { "Item", "Count" },
+                    a => a.Key,
+                    a => "x" + a.Value);
+
+                await FollowupWithFileAsync(image, "chests.jpeg", embed: content.ToMarkdown().ToEmbed(imageUrl: "attachment://chests.jpeg"));
+                return;
+            }
+
+            await FollowupWithFileAsync(image, "chests.jpeg");
+
+        }
+        [RequireUserDynastioAccount]
         [SlashCommand("chest", "your private chest")]
         public async Task personalChest(
-            bool all = false,
-            bool countItems = false,
-            ChestStyleType style = ChestStyleType.Default,
             [Autocomplete(typeof(SharedAutocompleteHandler.AccountAutocompleteHandler))] string account = "",
-            DynastioProviderType provider = DynastioProviderType.Main
-            )
+            ChestStyleType style = ChestStyleType.Default,
+            DynastioProviderType provider = DynastioProviderType.Main)
         {
             await DeferAsync();
             var dynastioProvider = Dynastio[provider];
+            UserAccount account_ = string.IsNullOrWhiteSpace(account)
+                    ? Context.BotUser.GetAccount()
+                    : Context.BotUser.GetAccount(int.Parse(account));
 
-            if (all && Context.BotUser.Accounts.Count > 1)
+            if (account_ is null)
             {
-                var chests = await Context.BotUser.Accounts.GetPersonalchests(dynastioProvider);
-                if (chests == null || chests.Count == 0)
-                {
-                    await FollowupAsync("chest not found.");
-                    return;
-                }
-                var image = GraphicService.GetPersonalChests(chests.ToArray());
-
-                string content = "";
-
-                if (countItems)
-                {
-                    Dictionary<string, int> items = new();
-                    foreach (var chest in chests)
-                    {
-                        foreach (var item in chest.Items)
-                        {
-                            var count = item.Count;
-                            if (items.TryGetValue(item.ItemType.ToString(), out int v))
-                            {
-                                items[item.ItemType.ToString()] = v + count;
-                            }
-                            else
-                            {
-                                items.Add(item.ItemType.ToString(), count);
-                            }
-                        }
-                    }
-
-                    content = items.OrderByDescending(a => a.Value).ToStringTable(new string[] { "Item", "Count" },
-                        a => a.Key,
-                        a => "x" + a.Value);
-
-                    await FollowupWithFileAsync(image, "chest.jpeg", embed: content.ToMarkdown().ToEmbed(imageUrl: "attachment://chest.jpeg"));
-                    return;
-                }
-
-                await FollowupWithFileAsync(image, "chest.jpeg");
+                await FollowupAsync("account not found.");
                 return;
             }
-            else
+
+            var chest = await dynastioProvider.GetUserPersonalchestAsync(account_.Id).TryGet();
+            if (chest == null)
             {
-                UserAccount account_ = string.IsNullOrWhiteSpace(account)
-                        ? Context.BotUser.GetAccount()
-                        : Context.BotUser.GetAccount(int.Parse(account));
-
-                if (account_ is null)
-                {
-                    await FollowupAsync("account not found.");
-                    return;
-                }
-                var chest = await dynastioProvider.GetUserPersonalchestAsync(account_.Id).TryGet();
-                if (chest == null)
-                {
-                    await FollowupAsync("chest not found, join the game and put something to your chest.");
-                    return;
-                }
-                var image = GraphicService.GetPersonalChest(chest, style);
-
-                await FollowupWithFileAsync(image, "chest.jpeg");
+                await FollowupAsync("chest not found, join the game and put something to your chest.");
+                return;
             }
+            var image = GraphicService.GetPersonalChest(chest, style);
+
+            await FollowupWithFileAsync(image, "chest.jpeg");
+
         }
 
     }

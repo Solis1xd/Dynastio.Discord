@@ -15,14 +15,14 @@ namespace Dynastio.Bot
         private readonly Configuration _configuration;
         private readonly GuildService _guildService;
         private readonly LocaleService _localeService;
-        private readonly IDatabase _db;
+        private readonly IDatabaseContext _db;
         public EventHandler(IServiceProvider services)
         {
             _client = services.GetRequiredService<DiscordSocketClient>();
             _configuration = services.GetRequiredService<Configuration>();
             _guildService = services.GetRequiredService<GuildService>();
             _localeService = services.GetRequiredService<LocaleService>();
-            _db = services.GetRequiredService<IDatabase>();
+            _db = services.GetRequiredService<IDatabaseContext>();
             _services = services;
         }
         public void Initialize()
