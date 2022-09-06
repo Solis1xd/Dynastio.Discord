@@ -173,7 +173,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                     return;
                 }
                 buser.RemoveAccount(selectedAccount);
-                await userManager.UpdateAsync(Context.BotUser);
+                await userManager.UpdateAsync(buser);
                 await FollowupAsync(embed: $"account removed from the user.".ToEmbed());
             }
             [RequireConfirmation]
@@ -196,7 +196,7 @@ namespace Dynastio.Bot.Interactions.Modules.Dynastio
                         break;
                 }
               
-                await userManager.UpdateAsync(Context.BotUser);
+                await userManager.UpdateAsync(buser);
 
                 await FollowupAsync(embed: $"the {user.Id.ToUserMention()} permission to ` {section} ` is ` {status} `.".ToEmbed());
             }

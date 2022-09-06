@@ -24,7 +24,7 @@ namespace Dynastio.Bot.Commands.Main_Guild
             Context.BotUser.Honor += gift;
             await UserService.UpdateAsync(Context.BotUser);
 
-            await Context.Channel.SendMessageAsync(Context.User.Id.ToUserMention(), embed: $"You got {gift} honor, your honor is {Context.BotUser.Honor}.".ToEmbed());
+            await Context.Channel.SendMessageAsync(Context.User.Id.ToUserMention(), embed: $"You got {gift} honor, your honor is {Context.BotUser.Honor}.".ToSuccessfulEmbed());
         }
     }
 }
