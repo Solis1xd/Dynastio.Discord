@@ -13,14 +13,16 @@ namespace Dynastio.Bot.Interactions.Modules
 
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    [RequireOwner]
+
     public class Test : CustomInteractionModuleBase<CustomSocketInteractionContext>
     {
         [SlashCommand("test", "test something")]
-        public async Task test(IAttachment attachment, IAttachment attachment1, IAttachment attachment2)
+        [AvoidUserDuplicateRun()]
+        public async Task test()
         {
             await DeferAsync();
- 
+            await FollowupAsync("wait 20s " + DateTime.UtcNow.AddSeconds(20).ToDiscordUnixTimestampFormat());
+            await Task.Delay(20000);
         }
     }
 }

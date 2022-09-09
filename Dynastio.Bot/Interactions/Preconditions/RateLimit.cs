@@ -37,7 +37,7 @@ namespace Discord.Interactions
                 _ = Task.Run(async () =>
                 {
                     await ClearExpiredCommands();
-                    _removeExpiredCommandsTime = DateTime.Now.AddMinutes(30);
+                    _removeExpiredCommandsTime = DateTime.UtcNow.AddMinutes(30);
                 });
             }
 
