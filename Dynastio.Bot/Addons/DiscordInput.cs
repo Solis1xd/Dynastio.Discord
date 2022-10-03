@@ -1,7 +1,9 @@
-//Originally made by jalaljaleh for Dynastio.Discord
-//Read the original file at https://github.com/jalaljaleh/Dynastio.Discord/blob/master/Dynastio.Bot/Addons/DiscordInput.cs
-//Originally licensed under Apache 2.0 https://github.com/jalaljaleh/Dynastio.Discord/blob/master/LICENSE.txt
-﻿
+/*!
+ * Discord Input v1.0 (https://jalaljaleh.github.io/)
+ * Copyright 2021-2022 Jalal Jaleh
+ * Licensed under Apache (https://github.com/jalaljaleh/Dynastio.Discord/blob/master/LICENSE.txt)
+ * Original (https://github.com/jalaljaleh/Dynastio.Discord/blob/master/Dynastio.Bot/Addons/DiscordInput.cs)
+ */
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
