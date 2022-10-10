@@ -1,21 +1,23 @@
 /*!
  * Discord Input v1.0 (https://jalaljaleh.github.io/)
  * Copyright 2021-2022 Jalal Jaleh
- * Licensed under Apache (https://github.com/jalaljaleh/Dynastio.Discord/blob/master/LICENSE.txt)
- * Original (https://github.com/jalaljaleh/Dynastio.Discord/blob/master/Dynastio.Bot/Addons/DiscordInput.cs)
+ * Licensed under MIT (https://github.com/jalaljaleh/Template.Discord.Bot/blob/master/LICENSE.txt)
+ * Original (https://github.com/jalaljaleh/Template.Discord.Bot/blob/master/Template/Utilities/DiscordInput.cs)
  */
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Dynastio.Bot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dynastio.Data;
-namespace Dynastio.Bot
-{
+
+namespace Dynastio.Bot {
+    
+ using Discord;
+ using Discord.Commands;
+ using Discord.WebSocket;
+ using Dynastio.Bot;
+ using System;
+ using System.Collections.Generic;
+ using System.Linq;
+ using System.Text;
+ using System.Threading.Tasks;
+ using Dynastio.Data;  
+ 
     public static class DiscordInput
     {
 
