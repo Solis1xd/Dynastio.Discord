@@ -1,11 +1,20 @@
+/*!
+ * Task Extension v1 (https://jalaljaleh.github.io/)
+ * Copyright 2021-2022 Jalal Jaleh
+ * Licensed under Apache (https://github.com/jalaljaleh/Dynastio.Discord/blob/master/LICENSE.txt)
+ * Original (https://github.com/jalaljaleh/Dynastio.Discord/blob/master/Dynastio.Bot/Extensions/TaskExtensions.cs)
+ */
+
+
+
+namespace Dynastio.Bot
+{
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynastio.Bot
-{
     public static class TaskExtensions
     {
         public static void RunInBackground(this Task task, bool tryCatch = false)
