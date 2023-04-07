@@ -1,4 +1,5 @@
 ﻿using System;
+using Dynastio.Bot;
 using Dynastio.Net;
 using Newtonsoft.Json;
 
@@ -6,12 +7,13 @@ namespace Dynastio.Test
 {
     public class Program
     {
-        public record TimeCache(string n, string b);
 
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            //    TimeCache a = new TimeCache("", "");
-           
+            var configuration = File.ReadAllText(Dynastio.Bot.Program.FilePathConfigurationMain);
+            string n = Encryption.Encrypt(configuration, "**");
+            Console.WriteLine(n);
+            Console.ReadKey();
         }
     }
 }

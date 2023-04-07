@@ -41,7 +41,7 @@ using Microsoft.Extensions.DependencyInjection;
         }
         public override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
-            if (LocalChannel.HasValue ? (context.Channel.Id == services.GetRequiredService<Configuration>().Channels.HonorChannel) : (context.Channel.Id == ChannelId))
+            if (LocalChannel.HasValue ? (context.Channel.Id == services.GetRequiredService<Dynastio.Bot.Configuration>().Channels.HonorChannel) : (context.Channel.Id == ChannelId))
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
                 return Task.FromResult(PreconditionResult.FromError(this.ErrorMessage ?? $"This channel is not supported try in <#{ChannelId.Value}>."));

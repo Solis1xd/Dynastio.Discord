@@ -23,31 +23,26 @@ namespace Dynastio.Bot
 
         public static Configuration Get(string debugPath)
         {
-            if (Program.IsDebug())
-            {
-                var configuration = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(debugPath));
-                return configuration;
-            }
+            //if (Program.IsDebug())
+            //{
+            //    var configuration = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(debugPath));
+            //    return configuration;
+            //}
 
 
-            string path = Environment.GetEnvironmentVariable("path");
-            if (!string.IsNullOrEmpty(path))
-                return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(path));
+            //string path = Environment.GetEnvironmentVariable("path");
+            //if (!string.IsNullOrEmpty(path))
+            //    return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(path));
 
-            string config = Environment.GetEnvironmentVariable("config");
-            if (!string.IsNullOrEmpty(config))
-                return JsonConvert.DeserializeObject<Configuration>(config);
+            //string config = Environment.GetEnvironmentVariable("config");
+            //if (!string.IsNullOrEmpty(config))
+            //    return JsonConvert.DeserializeObject<Configuration>(config);
 
-            var configuration_ = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(@"config.json"));
-            return configuration_;
 
-            string key = Environment.GetEnvironmentVariable("key");
-            string encryptedvalue = Environment.GetEnvironmentVariable("encryptedvalue");
-
-            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(encryptedvalue))
-                return JsonConvert.DeserializeObject<Configuration>(Encryption.Decrypt(encryptedvalue, key));
-
-            return null;
+            string key = Environment.GetEnvironmentVariable("config-key");
+            string encryptedvalue = File.ReadAllText(@"config.d".ResourcesPath());
+            string value = Encryption.Decrypt(encryptedvalue, key);
+            return JsonConvert.DeserializeObject<Configuration>(value);
         }
     }
     public class GuildsConfiguration

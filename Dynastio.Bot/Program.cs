@@ -21,8 +21,8 @@ namespace Dynastio.Bot
         public const int ImageOnlyChannelsSlowMode = 30;
         public static Random Random = new Random();
         public static DateTime StartUp { get; } = DateTime.UtcNow;
-        public const string FilePathConfigurationMain = @"J:\Members\Jaleh Jalal\projects\Dynastio\dynastio.json";
-        public const string FilePathConfigurationDebug = @"J:\Members\Jaleh Jalal\projects\Dynastio\dynastio.debug.json";
+        public const string FilePathConfigurationMain = @"C:\Users\Jalal Jaleh\OneDrive\Members\Jaleh Jalal\projects\Dynastio\dynastio.json";
+        public const string FilePathConfigurationDebug = @"C:\Users\Jalal Jaleh\OneDrive\Members\Jaleh Jalal\projects\Dynastio\dynastio.debug.json";
         public static bool IsYoutubeServiceInitialized = false;
         public static void Main(string[] arg) => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()

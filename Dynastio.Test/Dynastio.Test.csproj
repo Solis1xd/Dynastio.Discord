@@ -11,4 +11,8 @@
     <PackageReference Include="Dynastio.Net" Version="2.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Dynastio.Bot\Dynastio.Bot.csproj" />
+  </ItemGroup>
+
 </Project>
